@@ -2,7 +2,7 @@
 
 <div class="row">
     <div class="col-lg-8 col-lg-offset-1">
-        <canvas style="width:100%;background:blue;"></canvas>
+        <canvas id="canvas" style="width:100%;background:blue;"></canvas>
     </div>
     <div class="col-lg-2">
         <div class="panel panel-default">
@@ -58,10 +58,90 @@
                     }
                 })
             });
+			
+			// Create a new game.
+            var game = new Game();
 
-            //canvas = document.getElementsByName("canvas");
-            //context = canvas.getContext("2d");
+			// Draw the game to the canvas.
+            canvas = document.getElementById("canvas");
+            context = canvas.getContext("2d");
+            game.draw(context);
         });
+		
+        function Sprite(image, sourceX, sourceY, sourceWidth, sourceHeight)
+		{
+        	this.image = image;
+        	this.sourceX = sourceX;
+        	this.sourceY = sourceY;
+        	this.sourceWidth = sourceWidth;
+        	this.sourceHeight = sourceHeight;
+        }
+
+		function ChessPiece(name, sprite, x, y)
+		{
+			this.name = name;
+			this.sprite = sprite;
+			this.x = x;
+			this.y = y;
+		}
+
+        function ChessBoard()
+		{
+        	this.width = 8;
+        	this.height = 8;
+
+			// Create an empty grid.
+        	this.grid = new Array(this.width);
+        	for (var x = 0; x < this.width; x += 1)
+        	{
+        		this.grid[x] = Array(this.height);
+        		for (var y = 0; y < this.height; y += 1)
+        		{
+					this.grid[x][y] = null;
+        		}
+        	}
+
+			this.grid[2][3] = new ChessPiece("Pawn", null, 2, 3);
+        }
+
+        function Game() {
+			
+			this.board = new ChessBoard();
+
+			// Draw the game to the canvas.
+        	this.draw = function (context) {
+
+				//var spr = Sprite(image, 0, 0, 60, 60);
+
+				squareSize = 10;
+
+				for (var x = 0; x < this.board.width; x += 1)
+        		{
+        			for (var y = 0; y < this.board.height; y += 1)
+        			{
+						// Draw the grid square.
+						var isBlack = (y % 2 == 0 ? x % 2 == 0 : x % 2 == 1);
+						if (isBlack)
+							context.fillStyle = "black"
+						else
+							context.fillStyle = "white"
+        				context.fillRect(x * squareSize, y * squareSize,
+							squareSize, squareSize);
+						
+						var piece = this.board.grid[x][y];
+
+						// Draw a chess piece that might be on this square.
+						if (piece != null)
+						{
+							context.fillStyle = "yellow"
+        					context.fillRect(x * squareSize, y * squareSize,
+								squareSize, squareSize);
+						}
+        			}
+        		}
+        	}
+        }
+
 
     </script>
 }
