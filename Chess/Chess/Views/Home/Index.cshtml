@@ -29,6 +29,7 @@
 @section Scripts {
     <script src="signalr/hubs"></script>
     <script>
+
         $(function () {
             // Declare a proxy to reference the hub. 
             var chat = $.connection.chatHub;
@@ -57,6 +58,10 @@
                     }
                 })
             });
+
+            //canvas = document.getElementsByName("canvas");
+            //context = canvas.getContext("2d");
         });
+
     </script>
 }
