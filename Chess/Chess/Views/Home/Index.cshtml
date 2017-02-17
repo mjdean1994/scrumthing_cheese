@@ -8,14 +8,53 @@
                 <h2 class="panel-title">Chat</h2>
             </div>
             <div class="panel-body">
-                Chat shit here
+                <ul id="chatListTemp">
+
+                </ul>
                 <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Say something..." />
+                    <input type="hidden" value="Matt" id="username" />
+                    <input type="hidden" value="white" id="team" />
+                    <input type="text" class="form-control" id="message" placeholder="Say something..." />
                     <span class="input-group-btn">
-                        <button class="btn btn-primary"><span class="glyphicon glyphicon-send"</button>
+                        <button class="btn btn-primary" id="sendChat"><span class="glyphicon glyphicon-send"></span></button>
                     </span>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="signalr/hubs"></script>
+    <script>
+        $(function () {
+            // Declare a proxy to reference the hub. 
+            var chat = $.connection.chatHub;
+            // Create a function that the hub can call to broadcast messages.
+            chat.client.broadcastMessage = function (name, message, team) {
+                // Add the message to the page. 
+                $('#chatListTemp').append('<li><strong>' + name
+                    + '</strong>:&nbsp;&nbsp;' + message + '</li>');
+            };
+
+            // Set initial focus to message input box.  
+            $('#message').focus();
+            // Start the connection.
+            $.connection.hub.start().done(function () {
+                $('#sendChat').click(function () {
+                    // Call the Send method on the hub. 
+                    chat.server.send($('#username').val(), $('#message').val(), $("#team").val());
+                    // Clear text box and reset focus for next comment. 
+                    $('#message').val('').focus();
+                });
+
+                $("#message").keypress(function (e) {
+                    if(e.which == 13)
+                    {
+                        $("#sendChat").click();
+                    }
+                })
+            });
+        });
+    </script>
+}

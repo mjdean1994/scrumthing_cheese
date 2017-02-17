@@ -80,3 +80,7 @@ H:\scrumthing_chess\Chess\Chess\bin\Microsoft.Owin.Security.Twitter.xml
 H:\scrumthing_chess\Chess\Chess\bin\Microsoft.Owin.Security.MicrosoftAccount.xml
 H:\scrumthing_chess\Chess\Chess\obj\Debug\Chess.dll
 H:\scrumthing_chess\Chess\Chess\obj\Debug\Chess.pdb
+H:\scrumthing_chess\Chess\Chess\bin\Microsoft.AspNet.SignalR.Core.dll
+H:\scrumthing_chess\Chess\Chess\bin\Microsoft.AspNet.SignalR.SystemWeb.dll
+H:\scrumthing_chess\Chess\Chess\bin\Microsoft.AspNet.SignalR.Core.xml
+H:\scrumthing_chess\Chess\Chess\bin\Microsoft.AspNet.SignalR.SystemWeb.xml
