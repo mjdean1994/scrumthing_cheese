@@ -1,4 +1,6 @@
 
 
-Chess/Chess/bin/*
-Chess/Chess/obj/*
+Chess/Chess/bin/
+Chess/Chess/obj/
+Chess/.vs/
+
