@@ -1,4 +1,6 @@
-﻿<div class="row">
+﻿@model Chess.ViewModels.IndexViewModel
+
+<div class="row">
     <div class="col-lg-8 col-lg-offset-1">
         <canvas style="width:100%;background:blue;"></canvas>
     </div>
@@ -12,7 +14,7 @@
 
                 </ul>
                 <div class="input-group">
-                    <input type="hidden" value="Matt" id="username" />
+                    <input type="hidden" value="@Model.Username" id="username" />
                     <input type="hidden" value="white" id="team" />
                     <input type="text" class="form-control" id="message" placeholder="Say something..." />
                     <span class="input-group-btn">
