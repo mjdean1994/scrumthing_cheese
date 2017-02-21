@@ -74,7 +74,7 @@
             context = canvas.getContext("2d");
             game.draw(context);
         });
-		
+
         function Sprite(image, sourceX, sourceY, sourceWidth, sourceHeight)
 		{
         	this.image = image;
@@ -84,10 +84,14 @@
         	this.sourceHeight = sourceHeight;
         }
 
-		function ChessPiece(name, sprite, x, y)
+        function ChessPieceType(name, sprite) {
+            this.name = name;
+            this.sprite = sprite;
+        }
+
+        function ChessPiece(pieceType, x, y)
 		{
-			this.name = name;
-			this.sprite = sprite;
+			this.pieceType = pieceType;
 			this.x = x;
 			this.y = y;
 		}
@@ -108,20 +112,60 @@
         		}
         	}
 
-			this.grid[2][3] = new ChessPiece("Pawn", null, 2, 3);
+        	this.placeNewPiece = function (pieceType, x, y) 
+        	{
+        	    this.grid[x][y] = new ChessPiece(pieceType, x, y);
+        	}
+
+            this.setupBoard = function ()
+            {
+                // Load piece sprites.
+                var s = 60;
+                var image = null;
+	            //var image = new Image();
+	            //image.src = "ChessPieces.png";
+
+                // Create piece types.
+        	    var queen = ChessPieceType("Queen",   Sprite(image, 0 * s, 0 * s, s, s));
+        	    var king  = ChessPieceType("King",    Sprite(image, 1 * s, 0 * s, s, s));
+        	    var rook   = ChessPieceType("Rook",   Sprite(image, 2 * s, 0 * s, s, s));
+        	    var knight = ChessPieceType("Knight", Sprite(image, 3 * s, 0 * s, s, s));
+        	    var bishop = ChessPieceType("Bishop", Sprite(image, 4 * s, 0 * s, s, s));
+        	    var pawn   = ChessPieceType("Pawn",   Sprite(image, 5 * s, 0 * s, s, s));
+
+                // Place pieces onto the board for player 1.
+        	    this.placeNewPiece(rook,   0, 0)
+        	    this.placeNewPiece(knight, 1, 0)
+        	    this.placeNewPiece(bishop, 2, 0)
+        	    this.placeNewPiece(queen,  3, 0)
+        	    this.placeNewPiece(king,   4, 0)
+        	    this.placeNewPiece(bishop, 5, 0)
+        	    this.placeNewPiece(knight, 6, 0)
+        	    this.placeNewPiece(rook,   7, 0)
+        	    this.placeNewPiece(pawn,   0, 1)
+        	    this.placeNewPiece(pawn,   1, 1)
+        	    this.placeNewPiece(pawn,   2, 1)
+        	    this.placeNewPiece(pawn,   3, 1)
+        	    this.placeNewPiece(pawn,   4, 1)
+        	    this.placeNewPiece(pawn,   5, 1)
+        	    this.placeNewPiece(pawn,   6, 1)
+        	    this.placeNewPiece(pawn,   7, 1)
+            }
         }
 
         function Game() {
 			
 			this.board = new ChessBoard();
+            this.board.setupBoard();
 
 			// Draw the game to the canvas.
         	this.draw = function (context) {
 
 				//var spr = Sprite(image, 0, 0, 60, 60);
 
-				squareSize = 20;
+				squareSize = 10;
 
+                // Draw each grid square.
 				for (var x = 0; x < this.board.width; x += 1)
         		{
         			for (var y = 0; y < this.board.height; y += 1)
