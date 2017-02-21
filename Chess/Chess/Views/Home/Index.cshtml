@@ -10,17 +10,24 @@
                 <h2 class="panel-title">Chat</h2>
             </div>
             <div class="panel-body">
-                <ul id="chatListTemp">
-
-                </ul>
+                <div id="chatMessages" style="height:500px;overflow-y:auto;">
+                    <div class="media">
+                        <div class="media-body">
+                            <h4 class="media-heading">Matt</h4>
+                            My name is Matt.
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" value="@Model.Username" id="username" />
+                <input type="hidden" value="white" id="team" />
                 <div class="input-group">
-                    <input type="hidden" value="@Model.Username" id="username" />
-                    <input type="hidden" value="white" id="team" />
                     <input type="text" class="form-control" id="message" placeholder="Say something..." />
                     <span class="input-group-btn">
                         <button class="btn btn-primary" id="sendChat"><span class="glyphicon glyphicon-send"></span></button>
                     </span>
+
                 </div>
+                <label>You are chatting as @Model.Username</label>
             </div>
         </div>
     </div>
@@ -36,8 +43,8 @@
             // Create a function that the hub can call to broadcast messages.
             chat.client.broadcastMessage = function (name, message, team) {
                 // Add the message to the page. 
-                $('#chatListTemp').append('<li><strong>' + name
-                    + '</strong>:&nbsp;&nbsp;' + message + '</li>');
+                $('#chatMessages').append('<div class="media"><div class="media-body"><h4 class="media-heading">' + name
+                    + '</h4>' + message + '</div></div>');
             };
 
             // Set initial focus to message input box.  
@@ -113,7 +120,7 @@
 
 				//var spr = Sprite(image, 0, 0, 60, 60);
 
-				squareSize = 10;
+				squareSize = 20;
 
 				for (var x = 0; x < this.board.width; x += 1)
         		{
