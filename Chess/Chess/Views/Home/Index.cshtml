@@ -121,35 +121,34 @@
             {
                 // Load piece sprites.
                 var s = 60;
-                var image = null;
-	            //var image = new Image();
-	            //image.src = "ChessPieces.png";
+	            var image = new Image();
+	            image.src = "ChessPieces.png";
 
                 // Create piece types.
-        	    var queen = ChessPieceType("Queen",   Sprite(image, 0 * s, 0 * s, s, s));
-        	    var king  = ChessPieceType("King",    Sprite(image, 1 * s, 0 * s, s, s));
-        	    var rook   = ChessPieceType("Rook",   Sprite(image, 2 * s, 0 * s, s, s));
-        	    var knight = ChessPieceType("Knight", Sprite(image, 3 * s, 0 * s, s, s));
-        	    var bishop = ChessPieceType("Bishop", Sprite(image, 4 * s, 0 * s, s, s));
-        	    var pawn   = ChessPieceType("Pawn",   Sprite(image, 5 * s, 0 * s, s, s));
+        	    this.queen  = new ChessPieceType("Queen",  new Sprite(image, 0 * s, 0 * s, s, s));
+        	    this.king   = new ChessPieceType("King",   new Sprite(image, 1 * s, 0 * s, s, s));
+        	    this.rook   = new ChessPieceType("Rook",   new Sprite(image, 2 * s, 0 * s, s, s));
+        	    this.knight = new ChessPieceType("Knight", new Sprite(image, 3 * s, 0 * s, s, s));
+        	    this.bishop = new ChessPieceType("Bishop", new Sprite(image, 4 * s, 0 * s, s, s));
+        	    this.pawn   = new ChessPieceType("Pawn",   new Sprite(image, 5 * s, 0 * s, s, s));
 
                 // Place pieces onto the board for player 1.
-        	    this.placeNewPiece(rook,   0, 0)
-        	    this.placeNewPiece(knight, 1, 0)
-        	    this.placeNewPiece(bishop, 2, 0)
-        	    this.placeNewPiece(queen,  3, 0)
-        	    this.placeNewPiece(king,   4, 0)
-        	    this.placeNewPiece(bishop, 5, 0)
-        	    this.placeNewPiece(knight, 6, 0)
-        	    this.placeNewPiece(rook,   7, 0)
-        	    this.placeNewPiece(pawn,   0, 1)
-        	    this.placeNewPiece(pawn,   1, 1)
-        	    this.placeNewPiece(pawn,   2, 1)
-        	    this.placeNewPiece(pawn,   3, 1)
-        	    this.placeNewPiece(pawn,   4, 1)
-        	    this.placeNewPiece(pawn,   5, 1)
-        	    this.placeNewPiece(pawn,   6, 1)
-        	    this.placeNewPiece(pawn,   7, 1)
+        	    this.placeNewPiece(this.rook,   0, 0);
+        	    this.placeNewPiece(this.knight, 1, 0);
+        	    this.placeNewPiece(this.bishop, 2, 0);
+        	    this.placeNewPiece(this.queen,  3, 0);
+        	    this.placeNewPiece(this.king,   4, 0);
+        	    this.placeNewPiece(this.bishop, 5, 0);
+        	    this.placeNewPiece(this.knight, 6, 0);
+        	    this.placeNewPiece(this.rook,   7, 0);
+        	    this.placeNewPiece(this.pawn,   0, 1);
+        	    this.placeNewPiece(this.pawn,   1, 1);
+        	    this.placeNewPiece(this.pawn,   2, 1);
+        	    this.placeNewPiece(this.pawn,   3, 1);
+        	    this.placeNewPiece(this.pawn,   4, 1);
+        	    this.placeNewPiece(this.pawn,   5, 1);
+        	    this.placeNewPiece(this.pawn,   6, 1);
+        	    this.placeNewPiece(this.pawn,   7, 1);
             }
         }
 
@@ -160,10 +159,8 @@
 
 			// Draw the game to the canvas.
         	this.draw = function (context) {
-
-				//var spr = Sprite(image, 0, 0, 60, 60);
-
-				squareSize = 10;
+                
+				var squareSize = context.canvas.height * (1 / 8);
 
                 // Draw each grid square.
 				for (var x = 0; x < this.board.width; x += 1)
@@ -173,9 +170,9 @@
 						// Draw the grid square.
 						var isBlack = (y % 2 == 0 ? x % 2 == 0 : x % 2 == 1);
 						if (isBlack)
-							context.fillStyle = "black"
+							context.fillStyle = "gray";
 						else
-							context.fillStyle = "white"
+							context.fillStyle = "white";
         				context.fillRect(x * squareSize, y * squareSize,
 							squareSize, squareSize);
 						
@@ -184,9 +181,20 @@
 						// Draw a chess piece that might be on this square.
 						if (piece != null)
 						{
-							context.fillStyle = "yellow"
-        					context.fillRect(x * squareSize, y * squareSize,
-								squareSize, squareSize);
+                            var spr = piece.pieceType.sprite;
+                            
+                            if (spr != null && spr.image != null)
+                            {
+				                context.drawImage(spr.image, spr.sourceX, spr.sourceY,
+						            spr.sourceWidth, spr.sourceHeight,
+						            x * squareSize, y * squareSize, squareSize, squareSize);
+                            }
+                            else
+                            {
+							    context.fillStyle = "yellow";
+        					    context.fillRect(x * squareSize, y * squareSize,
+								    squareSize, squareSize);
+                            }
 						}
         			}
         		}
