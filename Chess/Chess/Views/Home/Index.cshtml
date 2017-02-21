@@ -148,7 +148,11 @@
         		}
         	}
         }
-
-
+        $("canvas").click(function (event) {
+            x = event.pageX - document.getElementById("canvas").offsetLeft;
+            y = event.pageX - document.getElementById("canvas").offsetTop;
+            console.log(x);
+            console.log(y);
+        })
     </script>
 }
