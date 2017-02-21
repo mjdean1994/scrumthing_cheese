@@ -121,16 +121,16 @@
             {
                 // Load piece sprites.
                 var s = 60;
-	            var image = new Image();
-	            image.src = "ChessPieces.png";
+	            this.image = new Image();
+	            this.image.src = "ChessPieces.png";
 
                 // Create piece types.
-        	    this.queen  = new ChessPieceType("Queen",  new Sprite(image, 0 * s, 0 * s, s, s));
-        	    this.king   = new ChessPieceType("King",   new Sprite(image, 1 * s, 0 * s, s, s));
-        	    this.rook   = new ChessPieceType("Rook",   new Sprite(image, 2 * s, 0 * s, s, s));
-        	    this.knight = new ChessPieceType("Knight", new Sprite(image, 3 * s, 0 * s, s, s));
-        	    this.bishop = new ChessPieceType("Bishop", new Sprite(image, 4 * s, 0 * s, s, s));
-        	    this.pawn   = new ChessPieceType("Pawn",   new Sprite(image, 5 * s, 0 * s, s, s));
+        	    this.queen  = new ChessPieceType("Queen",  new Sprite(this.image, 0 * s, 0 * s, s, s));
+        	    this.king   = new ChessPieceType("King",   new Sprite(this.image, 1 * s, 0 * s, s, s));
+        	    this.rook   = new ChessPieceType("Rook",   new Sprite(this.image, 2 * s, 0 * s, s, s));
+        	    this.knight = new ChessPieceType("Knight", new Sprite(this.image, 3 * s, 0 * s, s, s));
+        	    this.bishop = new ChessPieceType("Bishop", new Sprite(this.image, 4 * s, 0 * s, s, s));
+        	    this.pawn   = new ChessPieceType("Pawn",   new Sprite(this.image, 5 * s, 0 * s, s, s));
 
                 // Place pieces onto the board for player 1.
         	    this.placeNewPiece(this.rook,   0, 0);
