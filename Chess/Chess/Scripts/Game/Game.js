@@ -1,5 +1,8 @@
 ﻿
 
+//-------------------------------------------------------------------------
+// Game
+//-------------------------------------------------------------------------
 function Game()
 {
 			
@@ -59,7 +62,6 @@ function Game()
             this.dragPiece = square.piece;
             this.dragStartSquare = square;
             square.piece = null;
-            console.log("clicked on a " + square.piece.pieceType.name + "!");
         }
     }
 

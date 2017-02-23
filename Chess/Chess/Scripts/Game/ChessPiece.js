@@ -1,11 +1,18 @@
 ﻿
 
-function ChessPieceType(name, sprite) {
+//-------------------------------------------------------------------------
+// ChessPieceType
+//-------------------------------------------------------------------------
+function ChessPieceType(name, sprite)
+{
     this.name = name;
     this.sprite = sprite;
 }
 
 
+//-------------------------------------------------------------------------
+// ChessPiece
+//-------------------------------------------------------------------------
 function ChessPiece(pieceType)
 {
 	this.pieceType = pieceType;
