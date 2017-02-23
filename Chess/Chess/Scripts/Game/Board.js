@@ -49,40 +49,40 @@ function ChessBoard()
         this.pawn   = new ChessPieceType("Pawn",   new Sprite(this.image, 5 * s, 1 * s, s, s), new Sprite(this.image, 5 * s, 0 * s, s, s));
 
         // Place pieces onto the board for the white player.
-        this.placeNewPiece(0, 0, Teams.white, this.rook);
-        this.placeNewPiece(1, 0, Teams.white, this.knight);
-        this.placeNewPiece(2, 0, Teams.white, this.bishop);
-        this.placeNewPiece(3, 0, Teams.white, this.queen);
-        this.placeNewPiece(4, 0, Teams.white, this.king);
-        this.placeNewPiece(5, 0, Teams.white, this.bishop);
-        this.placeNewPiece(6, 0, Teams.white, this.knight);
-        this.placeNewPiece(7, 0, Teams.white, this.rook);
-        this.placeNewPiece(0, 1, Teams.white, this.pawn);
-        this.placeNewPiece(1, 1, Teams.white, this.pawn);
-        this.placeNewPiece(2, 1, Teams.white, this.pawn);
-        this.placeNewPiece(3, 1, Teams.white, this.pawn);
-        this.placeNewPiece(4, 1, Teams.white, this.pawn);
-        this.placeNewPiece(5, 1, Teams.white, this.pawn);
-        this.placeNewPiece(6, 1, Teams.white, this.pawn);
-        this.placeNewPiece(7, 1, Teams.white, this.pawn);
+        this.placeNewPiece(0, 0, Teams.black, this.rook);
+        this.placeNewPiece(1, 0, Teams.black, this.knight);
+        this.placeNewPiece(2, 0, Teams.black, this.bishop);
+        this.placeNewPiece(3, 0, Teams.black, this.queen);
+        this.placeNewPiece(4, 0, Teams.black, this.king);
+        this.placeNewPiece(5, 0, Teams.black, this.bishop);
+        this.placeNewPiece(6, 0, Teams.black, this.knight);
+        this.placeNewPiece(7, 0, Teams.black, this.rook);
+        this.placeNewPiece(0, 1, Teams.black, this.pawn);
+        this.placeNewPiece(1, 1, Teams.black, this.pawn);
+        this.placeNewPiece(2, 1, Teams.black, this.pawn);
+        this.placeNewPiece(3, 1, Teams.black, this.pawn);
+        this.placeNewPiece(4, 1, Teams.black, this.pawn);
+        this.placeNewPiece(5, 1, Teams.black, this.pawn);
+        this.placeNewPiece(6, 1, Teams.black, this.pawn);
+        this.placeNewPiece(7, 1, Teams.black, this.pawn);
 
         // Place pieces onto the board for the black player.
-        this.placeNewPiece(0, 7, Teams.black, this.rook);
-        this.placeNewPiece(1, 7, Teams.black, this.knight);
-        this.placeNewPiece(2, 7, Teams.black, this.bishop);
-        this.placeNewPiece(3, 7, Teams.black, this.queen);
-        this.placeNewPiece(4, 7, Teams.black, this.king);
-        this.placeNewPiece(5, 7, Teams.black, this.bishop);
-        this.placeNewPiece(6, 7, Teams.black, this.knight);
-        this.placeNewPiece(7, 7, Teams.black, this.rook);
-        this.placeNewPiece(0, 6, Teams.black, this.pawn);
-        this.placeNewPiece(1, 6, Teams.black, this.pawn);
-        this.placeNewPiece(2, 6, Teams.black, this.pawn);
-        this.placeNewPiece(3, 6, Teams.black, this.pawn);
-        this.placeNewPiece(4, 6, Teams.black, this.pawn);
-        this.placeNewPiece(5, 6, Teams.black, this.pawn);
-        this.placeNewPiece(6, 6, Teams.black, this.pawn);
-        this.placeNewPiece(7, 6, Teams.black, this.pawn);
+        this.placeNewPiece(0, 7, Teams.white, this.rook);
+        this.placeNewPiece(1, 7, Teams.white, this.knight);
+        this.placeNewPiece(2, 7, Teams.white, this.bishop);
+        this.placeNewPiece(3, 7, Teams.white, this.queen);
+        this.placeNewPiece(4, 7, Teams.white, this.king);
+        this.placeNewPiece(5, 7, Teams.white, this.bishop);
+        this.placeNewPiece(6, 7, Teams.white, this.knight);
+        this.placeNewPiece(7, 7, Teams.white, this.rook);
+        this.placeNewPiece(0, 6, Teams.white, this.pawn);
+        this.placeNewPiece(1, 6, Teams.white, this.pawn);
+        this.placeNewPiece(2, 6, Teams.white, this.pawn);
+        this.placeNewPiece(3, 6, Teams.white, this.pawn);
+        this.placeNewPiece(4, 6, Teams.white, this.pawn);
+        this.placeNewPiece(5, 6, Teams.white, this.pawn);
+        this.placeNewPiece(6, 6, Teams.white, this.pawn);
+        this.placeNewPiece(7, 6, Teams.white, this.pawn);
     }
     
     //-------------------------------------------------------------------------

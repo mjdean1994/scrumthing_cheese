@@ -22,7 +22,9 @@ function Game()
         this.board.setupBoard();
 
         this.squareSize = 64;
-
+        this.boardPosX = 0;
+        this.boardPosY = 0;
+        
         this.dragging = false;
         this.dragPiece = null;
         this.dragStartSquare = null;
@@ -41,8 +43,8 @@ function Game()
     {
         // Get the square location that was clicked on.
         var clientRect = canvas.getBoundingClientRect();
-        var mouseX = Math.floor(event.clientX - clientRect.left);
-        var mouseY = Math.floor(event.clientY - clientRect.top);
+        var mouseX = Math.floor(event.clientX - clientRect.left) - this.boardPosX;
+        var mouseY = Math.floor(event.clientY - clientRect.top) - this.boardPosY;
         var squareX = Math.floor(mouseX / this.squareSize);
         var squareY = Math.floor(mouseY / this.squareSize);
 
@@ -93,17 +95,19 @@ function Game()
     // Update the game for a single frame.
     this.update = function ()
     {
-
+        // Adjust board position and size based on canvas size.
+        // Board is made to be centered in the canvas.
+        this.squareSize = Math.floor((context.canvas.height / this.board.height) * 0.9);
+        var boardWidth = this.squareSize * this.board.width;
+        var boardHeight = this.squareSize * this.board.height;
+        this.boardPosX = Math.floor((context.canvas.width - boardWidth) / 2);
+        this.boardPosY = Math.floor((context.canvas.height - boardHeight) / 2);
     }
 
     //-------------------------------------------------------------------------
     // Draw the game to the canvas.
-    this.draw = function (context)
+    this.draw = function ()
     {
-        this.context = context;
-
-        this.squareSize = Math.floor(context.canvas.height / this.board.height);
-
         // Draw each grid square.
 		for (var x = 0; x < this.board.width; x += 1)
         {
@@ -118,13 +122,16 @@ function Game()
     // Draw the board square at the given location.
     this.drawBoardSquare = function (x, y)
     {
+        var drawPosX = this.boardPosX + (x * this.squareSize);
+        var drawPosY = this.boardPosY + (y * this.squareSize);
+
 		// Draw the grid square background.
-		var isBlack = (y % 2 == 0 ? x % 2 == 0 : x % 2 == 1);
+		var isBlack = (y % 2 == 0 ? (x % 2 == 1) : (x % 2 == 0));
 		if (isBlack)
 			this.context.fillStyle = "gray";
 		else
 			this.context.fillStyle = "white";
-        this.context.fillRect(x * this.squareSize, y * this.squareSize,
+        this.context.fillRect(drawPosX, drawPosY,
 			this.squareSize, this.squareSize);
 		
         var square = this.board.grid[x][y];
@@ -139,15 +146,14 @@ function Game()
             if (spr != null && spr.image != null)
             {
 				this.context.drawImage(spr.image, spr.sourceX, spr.sourceY,
-					spr.sourceWidth, spr.sourceHeight,
-					x * this.squareSize, y * this.squareSize,
+					spr.sourceWidth, spr.sourceHeight, drawPosX, drawPosY,
                     this.squareSize, this.squareSize);
             }
             else
             {
                 // Error: image not found! Draw a yellow square instead.
 				this.context.fillStyle = "yellow";
-        		this.context.fillRect(x * this.squareSize, y * this.squareSize,
+        		this.context.fillRect(drawPosX, drawPosY,
 					this.squareSize, this.squareSize);
             }
 		}

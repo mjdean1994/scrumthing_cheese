@@ -77,19 +77,16 @@
                 })
             });
 			
-			// Create a new game.
-            //var game = new Game();
-            
+            // Adjust the canvas's resolution to match its size.
             canvas = document.getElementById("canvas");
             canvas.width = canvas.clientWidth;
             canvas.height = canvas.clientHeight;
             context = canvas.getContext("2d");
 
             // Initialize the game.
-            console.log("Initializing game");
             game.initialize(canvas);
             
-            // Setup up input events.
+            // Setup up input event handlers.
             canvas.onmousemove = function (event) {
                 game.onMouseMove(event);
             };
@@ -105,7 +102,7 @@
             var frameTime = 1 / fps;
             setInterval(function() {
                 game.update();
-                game.draw(context);
+                game.draw();
             }, frameTime);
         });
 
