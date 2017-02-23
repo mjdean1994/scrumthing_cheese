@@ -5,13 +5,18 @@
 //-------------------------------------------------------------------------
 function Game()
 {
-			
+	
     //-------------------------------------------------------------------------
     // Initialize a new game.
     this.initialize = function (canvas) 
     {
         this.canvas = canvas;
         this.context = canvas.getContext("2d");
+
+        this.players = [
+            new Player(Teams.white),
+            new Player(Teams.black)
+        ];
 
         this.board = new ChessBoard();
         this.board.setupBoard();
@@ -21,6 +26,13 @@ function Game()
         this.dragging = false;
         this.dragPiece = null;
         this.dragStartSquare = null;
+    }
+
+    //-------------------------------------------------------------------------
+    // Get the player who's on the given team.
+    this.getPlayer = function (team)
+    {
+        return this.players(team)
     }
 
     //-------------------------------------------------------------------------
@@ -121,8 +133,9 @@ function Game()
 		// Draw a chess piece that might be on this square.
 		if (piece != null)
 		{
-            var spr = piece.pieceType.sprite;
-                            
+            var spr = piece.getSprite();
+                    
+            // Draw the piece sprite.
             if (spr != null && spr.image != null)
             {
 				this.context.drawImage(spr.image, spr.sourceX, spr.sourceY,
