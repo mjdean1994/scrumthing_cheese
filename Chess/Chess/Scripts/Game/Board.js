@@ -10,6 +10,7 @@ function BoardSquare(x, y)
 
 function ChessBoard()
 {
+    //-------------------------------------------------------------------------
     this.width = 8;
     this.height = 8;
 
@@ -23,19 +24,9 @@ function ChessBoard()
 			this.grid[x][y] = new BoardSquare(x, y);
         }
     }
-
-    this.getSquare = function (x, y)
-    {
-        if (x < 0 || y < 0 || x >= this.width || y >= this.height)
-            return null;
-        return this.grid[x][y];
-    }
-
-    this.placeNewPiece = function (pieceType, x, y) 
-    {
-        this.grid[x][y].piece = new ChessPiece(pieceType, x, y);
-    }
-
+    
+    //-------------------------------------------------------------------------
+    // Setup the board with pieces layed out for a new game.
     this.setupBoard = function ()
     {
         // Load piece sprites.
@@ -86,5 +77,29 @@ function ChessBoard()
         this.placeNewPiece(this.pawn,   5, 6);
         this.placeNewPiece(this.pawn,   6, 6);
         this.placeNewPiece(this.pawn,   7, 6);
+    }
+    
+    //-------------------------------------------------------------------------
+    // Get a board square at the given location. Returns null if the
+    // location is out of bounds.
+    this.getSquare = function (x, y)
+    {
+        if (x < 0 || y < 0 || x >= this.width || y >= this.height)
+            return null;
+        return this.grid[x][y];
+    }
+    
+    //-------------------------------------------------------------------------
+    // Piece a chess piece at the given location
+    this.placePiece = function (piece, x, y) 
+    {
+        this.grid[x][y].piece = piece;
+    }
+    
+    //-------------------------------------------------------------------------
+    // Piece a new piece of the given type at the given location.
+    this.placeNewPiece = function (pieceType, x, y) 
+    {
+        this.grid[x][y].piece = new ChessPiece(pieceType, x, y);
     }
 }

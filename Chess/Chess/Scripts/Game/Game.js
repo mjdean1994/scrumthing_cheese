@@ -3,6 +3,7 @@
 function Game()
 {
 			
+    //-------------------------------------------------------------------------
     // Initialize a new game.
     this.initialize = function (canvas) 
     {
@@ -15,9 +16,11 @@ function Game()
         this.squareSize = 64;
 
         this.dragging = false;
-        this.draggedPiece = null;
+        this.dragPiece = null;
+        this.dragStartSquare = null;
     }
 
+    //-------------------------------------------------------------------------
     // Called when a mouse button presses on the canvas.
     this.onMouseDown = function (event)
     {
@@ -30,38 +33,56 @@ function Game()
 
         // Check if there is a piece in this square.
         var square = game.board.getSquare(squareX, squareY);
-        if (square != null)
+
+        // Check if we are picking up or placing down.
+        if (this.dragging)
         {
-            if (square.piece != null)
-                console.log("clicked on a " + square.piece.pieceType.name + "!");
+            // Place this piece down.
+            if (square != null && square.piece == null)
+            {
+                square.piece = this.dragPiece;
+            }
             else
-                console.log("clicked on an empty square!");
+            {
+                // Invalid placement! Return it to its original position.
+                this.dragStartSquare.piece = this.dragPiece;
+            }
+
+            this.dragging = false;
+            this.dragPiece = null;
+            this.dragStartSquare = null;
+        }
+        else if (square != null && square.piece != null)
+        {
+            // Start dragging this piece.
+            this.dragging = true;
+            this.dragPiece = square.piece;
+            this.dragStartSquare = square;
+            square.piece = null;
+            console.log("clicked on a " + square.piece.pieceType.name + "!");
         }
     }
 
+    //-------------------------------------------------------------------------
     // Called when a mouse button releases on the canvas.
     this.onMouseUp = function (event)
     {
-
     }
 
+    //-------------------------------------------------------------------------
     // Called when the mouse is moved over the canvas.
     this.onMouseMove = function (event)
     {
-        // Get the square location that the mouse is hovering over.
-        var clientRect = canvas.getBoundingClientRect();
-        var mouseX = Math.floor(event.clientX - clientRect.left);
-        var mouseY = Math.floor(event.clientY - clientRect.top);
-        var squareX = Math.floor(mouseX / this.squareSize);
-        var squareY = Math.floor(mouseY / this.squareSize);
     }
 
+    //-------------------------------------------------------------------------
     // Update the game for a single frame.
     this.update = function ()
     {
 
     }
 
+    //-------------------------------------------------------------------------
     // Draw the game to the canvas.
     this.draw = function (context)
     {
@@ -79,6 +100,7 @@ function Game()
         }
     }
 
+    //-------------------------------------------------------------------------
     // Draw the board square at the given location.
     this.drawBoardSquare = function (x, y)
     {
@@ -90,8 +112,9 @@ function Game()
 			this.context.fillStyle = "white";
         this.context.fillRect(x * this.squareSize, y * this.squareSize,
 			this.squareSize, this.squareSize);
-			
-		var piece = this.board.grid[x][y].piece;
+		
+        var square = this.board.grid[x][y];
+		var piece = square.piece;
 
 		// Draw a chess piece that might be on this square.
 		if (piece != null)

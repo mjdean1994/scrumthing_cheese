@@ -5,10 +5,9 @@ function ChessPieceType(name, sprite) {
     this.sprite = sprite;
 }
 
-function ChessPiece(pieceType, x, y)
+
+function ChessPiece(pieceType)
 {
 	this.pieceType = pieceType;
-	this.x = x;
-	this.y = y;
 }
 
