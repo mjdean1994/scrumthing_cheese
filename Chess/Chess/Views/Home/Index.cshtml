@@ -36,6 +36,10 @@
 @section Scripts {
     <script src="signalr/hubs"></script>
     <script>
+        
+        var game = new Game();
+        var canvas = null;
+
 
         $(function () {
             // Declare a proxy to reference the hub. 
@@ -67,14 +71,35 @@
             });
 			
 			// Create a new game.
-            var game = new Game();
-
-			// Draw the game to the canvas.
+            //var game = new Game();
+            
             canvas = document.getElementById("canvas");
             canvas.width = canvas.clientWidth;
             canvas.height = canvas.clientHeight;
             context = canvas.getContext("2d");
-            game.draw(context);
+
+            // Initialize the game.
+            console.log("Initializing game");
+            game.initialize(canvas);
+            
+            // Setup up input events.
+            canvas.onmousemove = function (event) {
+                game.onMouseMove(event);
+            };
+            canvas.onmousedown = function (event) {
+                game.onMouseDown(event);
+            };
+            canvas.onmouseup = function (event) {
+                game.onMouseUp(event);
+            };
+
+            // Run the game.
+            var fps = 60;
+            var frameTime = 1 / fps;
+            setInterval(function() {
+                game.update();
+                game.draw(context);
+            }, frameTime);
         });
 
         function Sprite(image, sourceX, sourceY, sourceWidth, sourceHeight)
@@ -98,6 +123,13 @@
 			this.y = y;
 		}
 
+        function BoardSquare(x, y)
+        {
+			this.x = x;
+			this.y = y;
+            this.piece = null;
+        }
+
         function ChessBoard()
 		{
         	this.width = 8;
@@ -110,13 +142,20 @@
         		this.grid[x] = Array(this.height);
         		for (var y = 0; y < this.height; y += 1)
         		{
-					this.grid[x][y] = null;
+					this.grid[x][y] = new BoardSquare(x, y);
         		}
         	}
 
+            this.getSquare = function (x, y)
+            {
+                if (x < 0 || y < 0 || x >= this.width || y >= this.height)
+                    return null;
+                return this.grid[x][y];
+            }
+
         	this.placeNewPiece = function (pieceType, x, y) 
         	{
-        	    this.grid[x][y] = new ChessPiece(pieceType, x, y);
+        	    this.grid[x][y].piece = new ChessPiece(pieceType, x, y);
         	}
 
             this.setupBoard = function ()
@@ -151,19 +190,92 @@
         	    this.placeNewPiece(this.pawn,   5, 1);
         	    this.placeNewPiece(this.pawn,   6, 1);
         	    this.placeNewPiece(this.pawn,   7, 1);
+
+                // Place pieces onto the board for player 2.
+        	    this.placeNewPiece(this.rook,   0, 7);
+        	    this.placeNewPiece(this.knight, 1, 7);
+        	    this.placeNewPiece(this.bishop, 2, 7);
+        	    this.placeNewPiece(this.king,   4, 7);
+        	    this.placeNewPiece(this.queen,  3, 7);
+        	    this.placeNewPiece(this.bishop, 5, 7);
+        	    this.placeNewPiece(this.knight, 6, 7);
+        	    this.placeNewPiece(this.rook,   7, 7);
+        	    this.placeNewPiece(this.pawn,   0, 6);
+        	    this.placeNewPiece(this.pawn,   1, 6);
+        	    this.placeNewPiece(this.pawn,   2, 6);
+        	    this.placeNewPiece(this.pawn,   3, 6);
+        	    this.placeNewPiece(this.pawn,   4, 6);
+        	    this.placeNewPiece(this.pawn,   5, 6);
+        	    this.placeNewPiece(this.pawn,   6, 6);
+        	    this.placeNewPiece(this.pawn,   7, 6);
             }
         }
 
-        function Game() {
+        function Game()
+        {
 			
-			this.board = new ChessBoard();
-            this.board.setupBoard();
-
-			// Draw the game to the canvas.
-        	this.draw = function (context) {
+            // Initialize a new game.
+            this.initialize = function (canvas) 
+            {
+                this.canvas = canvas;
                 
-				//var squareSize = context.canvas.height * (1 / 8);
-                var squareSize = 64;
+                this.board = new ChessBoard();
+                this.board.setupBoard();
+
+                this.squareSize = 64;
+            }
+
+            // Called when a mouse button presses on the canvas.
+            this.onMouseDown = function (event)
+            {
+                // Get the square location that was clicked on.
+                var clientRect = canvas.getBoundingClientRect();
+                var mouseX = Math.floor(event.clientX - clientRect.left);
+                var mouseY = Math.floor(event.clientY - clientRect.top);
+                var squareX = Math.floor(mouseX / this.squareSize);
+                var squareY = Math.floor(mouseY / this.squareSize);
+
+                console.log("mouse: (" + mouseX + ", " + mouseY + ")");
+                console.log("square: (" + squareX + ", " + squareY + ")");
+
+                // Check if there is a piece in this square.
+                var square = game.board.getSquare(squareX, squareY);
+                if (square != null)
+                {
+                    if (square.piece != null)
+                        console.log("clicked on a " + square.piece.pieceType.name + "!");
+                    else
+                        console.log("clicked on an empty square!");
+                }
+            }
+
+            // Called when a mouse button releases on the canvas.
+            this.onMouseUp = function (event)
+            {
+                console.log("mouse releasedd")
+            }
+
+            // Called when the mouse is moved over the canvas.
+            this.onMouseMove = function (event)
+            {
+                // Get the square location that the mouse is hovering over.
+                var clientRect = canvas.getBoundingClientRect();
+                var mouseX = Math.floor(event.clientX - clientRect.left);
+                var mouseY = Math.floor(event.clientY - clientRect.top);
+                var squareX = Math.floor(mouseX / this.squareSize);
+                var squareY = Math.floor(mouseY / this.squareSize);
+            }
+
+            // Update the game for a single frame.
+            this.update = function ()
+            {
+
+            }
+
+            // Draw the game to the canvas.
+            this.draw = function (context)
+            {
+                this.squareSize = Math.floor(context.canvas.height / this.board.height);
 
                 // Draw each grid square.
 				for (var x = 0; x < this.board.width; x += 1)
@@ -176,10 +288,10 @@
 							context.fillStyle = "gray";
 						else
 							context.fillStyle = "white";
-        				context.fillRect(x * squareSize, y * squareSize,
-							squareSize, squareSize);
+        				context.fillRect(x * this.squareSize, y * this.squareSize,
+							this.squareSize, this.squareSize);
 						
-						var piece = this.board.grid[x][y];
+						var piece = this.board.grid[x][y].piece;
 
 						// Draw a chess piece that might be on this square.
 						if (piece != null)
@@ -190,13 +302,14 @@
                             {
 				                context.drawImage(spr.image, spr.sourceX, spr.sourceY,
 						            spr.sourceWidth, spr.sourceHeight,
-						            x * squareSize, y * squareSize, squareSize, squareSize);
+						            x * this.squareSize, y * this.squareSize,
+                                    this.squareSize, this.squareSize);
                             }
                             else
                             {
 							    context.fillStyle = "yellow";
-        					    context.fillRect(x * squareSize, y * squareSize,
-								    squareSize, squareSize);
+        					    context.fillRect(x * this.squareSize, y * this.squareSize,
+								    this.squareSize, this.squareSize);
                             }
 						}
         			}
