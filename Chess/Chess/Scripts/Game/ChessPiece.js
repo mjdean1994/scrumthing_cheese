@@ -1,7 +1,8 @@
 ﻿
 
 //-------------------------------------------------------------------------
-// ChessPieceType
+// ChessPieceType - A unique piece type that a chess piece can be.
+//                  (Pawn, Rook, Bishop, Knight, King, Queen)
 //-------------------------------------------------------------------------
 function ChessPieceType(name, spriteWhite, spriteBlack)
 {
@@ -12,13 +13,17 @@ function ChessPieceType(name, spriteWhite, spriteBlack)
 
 
 //-------------------------------------------------------------------------
-// ChessPiece
+// ChessPiece - An instance of a chess piece in the game.
 //-------------------------------------------------------------------------
-function ChessPiece(pieceType, team)
+function ChessPiece(pieceType, team, x, y)
 {
 	this.pieceType = pieceType;
     this.team = team;
+    this.x = x;
+    this.y = y;
+    this.captured = false;
 
+    //---------------------------------------------------------------------
     // Get the sprite for this chess piece.
     this.getSprite = function ()
     {

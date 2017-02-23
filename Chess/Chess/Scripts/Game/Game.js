@@ -1,8 +1,8 @@
 ﻿
 
-//-------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // Game
-//-------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 function Game()
 {
 	
@@ -13,28 +13,94 @@ function Game()
         this.canvas = canvas;
         this.context = canvas.getContext("2d");
 
+        this.squareSize = 64;
+        this.boardPosX = 0;
+        this.boardPosY = 0;
+        this.dragging = false;
+        this.dragPiece = null;
+        this.dragStartSquare = null;
+
         this.players = [
             new Player(Teams.white),
             new Player(Teams.black)
         ];
 
         this.board = new ChessBoard();
-        this.board.setupBoard();
-
-        this.squareSize = 64;
-        this.boardPosX = 0;
-        this.boardPosY = 0;
         
-        this.dragging = false;
-        this.dragPiece = null;
-        this.dragStartSquare = null;
+        this.initializePieceTypes();
+        this.initializeBoard();
+    }
+    
+    //-------------------------------------------------------------------------
+    // Initialize the possible chess piece types.
+    this.initializePieceTypes = function ()
+    {
+        // Load piece sprite sheet image.
+        var s = 60;
+	    var image = new Image();
+	    image.src = "ChessPieces.png";
+
+        // Create piece types.
+        this.queen  = new ChessPieceType("Queen",  new Sprite(image, 0 * s, 1 * s, s, s), new Sprite(image, 0 * s, 0 * s, s, s));
+        this.king   = new ChessPieceType("King",   new Sprite(image, 1 * s, 1 * s, s, s), new Sprite(image, 1 * s, 0 * s, s, s));
+        this.rook   = new ChessPieceType("Rook",   new Sprite(image, 2 * s, 1 * s, s, s), new Sprite(image, 2 * s, 0 * s, s, s));
+        this.knight = new ChessPieceType("Knight", new Sprite(image, 3 * s, 1 * s, s, s), new Sprite(image, 3 * s, 0 * s, s, s));
+        this.bishop = new ChessPieceType("Bishop", new Sprite(image, 4 * s, 1 * s, s, s), new Sprite(image, 4 * s, 0 * s, s, s));
+        this.pawn   = new ChessPieceType("Pawn",   new Sprite(image, 5 * s, 1 * s, s, s), new Sprite(image, 5 * s, 0 * s, s, s));
+    }
+    
+    //-------------------------------------------------------------------------
+    // Setup the board with pieces laid out for a new game.
+    this.initializeBoard = function ()
+    {
+        // Place pieces onto the board for the black player.
+        this.getPlayer(Teams.black).piecesInPlay =
+        [
+            this.board.placeNewPiece(0, 0, Teams.black, this.rook),
+            this.board.placeNewPiece(1, 0, Teams.black, this.knight),
+            this.board.placeNewPiece(2, 0, Teams.black, this.bishop),
+            this.board.placeNewPiece(3, 0, Teams.black, this.queen),
+            this.board.placeNewPiece(4, 0, Teams.black, this.king),
+            this.board.placeNewPiece(5, 0, Teams.black, this.bishop),
+            this.board.placeNewPiece(6, 0, Teams.black, this.knight),
+            this.board.placeNewPiece(7, 0, Teams.black, this.rook),
+            this.board.placeNewPiece(0, 1, Teams.black, this.pawn),
+            this.board.placeNewPiece(1, 1, Teams.black, this.pawn),
+            this.board.placeNewPiece(2, 1, Teams.black, this.pawn),
+            this.board.placeNewPiece(3, 1, Teams.black, this.pawn),
+            this.board.placeNewPiece(4, 1, Teams.black, this.pawn),
+            this.board.placeNewPiece(5, 1, Teams.black, this.pawn),
+            this.board.placeNewPiece(6, 1, Teams.black, this.pawn),
+            this.board.placeNewPiece(7, 1, Teams.black, this.pawn)
+        ];
+
+        // Place pieces onto the board for the white player.
+        this.getPlayer(Teams.white).piecesInPlay =
+        [
+            this.board.placeNewPiece(0, 7, Teams.white, this.rook),
+            this.board.placeNewPiece(1, 7, Teams.white, this.knight),
+            this.board.placeNewPiece(2, 7, Teams.white, this.bishop),
+            this.board.placeNewPiece(3, 7, Teams.white, this.queen),
+            this.board.placeNewPiece(4, 7, Teams.white, this.king),
+            this.board.placeNewPiece(5, 7, Teams.white, this.bishop),
+            this.board.placeNewPiece(6, 7, Teams.white, this.knight),
+            this.board.placeNewPiece(7, 7, Teams.white, this.rook),
+            this.board.placeNewPiece(0, 6, Teams.white, this.pawn),
+            this.board.placeNewPiece(1, 6, Teams.white, this.pawn),
+            this.board.placeNewPiece(2, 6, Teams.white, this.pawn),
+            this.board.placeNewPiece(3, 6, Teams.white, this.pawn),
+            this.board.placeNewPiece(4, 6, Teams.white, this.pawn),
+            this.board.placeNewPiece(5, 6, Teams.white, this.pawn),
+            this.board.placeNewPiece(6, 6, Teams.white, this.pawn),
+            this.board.placeNewPiece(7, 6, Teams.white, this.pawn)
+        ];
     }
 
     //-------------------------------------------------------------------------
     // Get the player who's on the given team.
     this.getPlayer = function (team)
     {
-        return this.players(team)
+        return this.players[team];
     }
 
     //-------------------------------------------------------------------------
@@ -54,28 +120,27 @@ function Game()
         // Check if we are picking up or placing down.
         if (this.dragging)
         {
-            // Place this piece down.
-            if (square != null && square.piece == null)
+            // Place the piece down.
+            if (square != null && !square.hasPiece())
             {
-                square.piece = this.dragPiece;
+                square.placePiece(this.dragPiece);
             }
             else
             {
                 // Invalid placement! Return it to its original position.
-                this.dragStartSquare.piece = this.dragPiece;
+                this.dragStartSquare.placePiece(this.dragPiece);
             }
 
             this.dragging = false;
             this.dragPiece = null;
             this.dragStartSquare = null;
         }
-        else if (square != null && square.piece != null)
+        else if (square != null && square.hasPiece())
         {
             // Start dragging this piece.
             this.dragging = true;
-            this.dragPiece = square.piece;
+            this.dragPiece = square.pickupPiece();
             this.dragStartSquare = square;
-            square.piece = null;
         }
     }
 
