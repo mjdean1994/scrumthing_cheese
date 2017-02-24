@@ -231,6 +231,11 @@
     <Content Include="fonts\fontawesome-webfont.ttf" />
     <Content Include="fonts\fontawesome-webfont.eot" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
+    <Content Include="Scripts\Game\Board.js" />
+    <Content Include="Scripts\Game\ChessPiece.js" />
+    <Content Include="Scripts\Game\Game.js" />
+    <Content Include="Scripts\Game\Player.js" />
+    <Content Include="Scripts\Game\Sprite.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
