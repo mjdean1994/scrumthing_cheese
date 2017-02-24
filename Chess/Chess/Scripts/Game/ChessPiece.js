@@ -11,6 +11,14 @@ function ChessPieceType(name, spriteWhite, spriteBlack)
     this.spriteBlack = spriteBlack;
 }
 
+//-------------------------------------------------------------------------
+// Move - Represents a move to a specific location.
+//-------------------------------------------------------------------------
+function Move(x, y)
+{
+    this.x = x;
+    this.y = y;
+}
 
 //-------------------------------------------------------------------------
 // ChessPiece - An instance of a chess piece in the game.
@@ -39,8 +47,16 @@ function ChessPiece(pieceType, team, x, y)
     this.getValidMoves = function(board)
     {
         var moves = [];
-
-
+        
+        // TODO: use actual move rules.
+        if (this.x < board.width - 1)
+            moves.push(new Move(this.x + 1, this.y));
+        if (this.x > 0)
+            moves.push(new Move(this.x - 1, this.y));
+        if (this.y < board.height - 1)
+            moves.push(new Move(this.x, this.y + 1));
+        if (this.y > 0)
+            moves.push(new Move(this.x, this.y - 1));
 
         return moves;
     }

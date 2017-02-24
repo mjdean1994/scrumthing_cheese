@@ -29,6 +29,8 @@ function Game()
         
         this.initializePieceTypes();
         this.initializeBoard();
+
+        this.validMoves = []; // Valid possible moves for selected chess piece.
     }
     
     //-------------------------------------------------------------------------
@@ -120,8 +122,20 @@ function Game()
         // Check if we are picking up or placing down.
         if (this.dragging)
         {
+            // Check if this square is in our list of valid moves.
+            var isValidMove = false;
+            for (var i = 0; i < this.validMoves.length; i++)
+            {
+                if (this.validMoves[i].x == squareX &&
+                    this.validMoves[i].y == squareY)
+                {
+                    isValidMove = true;
+                    break;
+                }
+            }
+
             // Place the piece down.
-            if (square != null && !square.hasPiece() && this.dragPiece.validMove(squareX, squareY))
+            if (square != null && !square.hasPiece() && isValidMove)//this.dragPiece.validMove(squareX, squareY))
             {
                 square.placePiece(this.dragPiece);
             }
@@ -134,6 +148,7 @@ function Game()
             this.dragging = false;
             this.dragPiece = null;
             this.dragStartSquare = null;
+            this.validMoves = [];
         }
         else if (square != null && square.hasPiece())
         {
@@ -141,6 +156,8 @@ function Game()
             this.dragging = true;
             this.dragPiece = square.pickupPiece();
             this.dragStartSquare = square;
+            
+            this.validMoves = this.dragPiece.getValidMoves(this.board);
         }
     }
 
@@ -189,24 +206,43 @@ function Game()
     {
         var drawPosX = this.boardPosX + (x * this.squareSize);
         var drawPosY = this.boardPosY + (y * this.squareSize);
+        		
+        var square = this.board.grid[x][y];
+		var piece = square.piece;
+        var isValidMove = false;
+
+        // Check if this square is in our list of valid moves.
+        for (var i = 0; i < this.validMoves.length; i++)
+        {
+            if (this.validMoves[i].x == x &&
+                this.validMoves[i].y == y)
+            {
+                isValidMove = true;
+                break;
+            }
+        }
 
 		// Draw the grid square background.
 		var isBlack = (y % 2 == 0 ? (x % 2 == 1) : (x % 2 == 0));
-		if (isBlack)
+        if (isValidMove)
+        {
+            if (piece != null)
+			    this.context.fillStyle = "red"; // capture move
+            else
+			    this.context.fillStyle = "yellow";
+        }
+		else if (isBlack)
 			this.context.fillStyle = "gray";
 		else
 			this.context.fillStyle = "white";
         this.context.fillRect(drawPosX, drawPosY,
 			this.squareSize, this.squareSize);
-		
-        var square = this.board.grid[x][y];
-		var piece = square.piece;
 
 		// Draw a chess piece that might be on this square.
 		if (piece != null)
 		{
             var spr = piece.getSprite();
-                    
+            
             // Draw the piece sprite.
             if (spr != null && spr.image != null)
             {
