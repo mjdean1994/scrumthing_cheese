@@ -34,7 +34,19 @@ function ChessPiece(pieceType, team, x, y)
         return null;
     }
 
-    //check if move is valid
+    //---------------------------------------------------------------------
+    // Get a list of valid moves this piece can make given the board state.
+    this.getValidMoves = function(board)
+    {
+        var moves = [];
+
+
+
+        return moves;
+    }
+
+    //---------------------------------------------------------------------
+    // Check if move is valid.
     this.validMove = function (targetX, targetY) {
         var x = this.x;
         var y = this.y;
