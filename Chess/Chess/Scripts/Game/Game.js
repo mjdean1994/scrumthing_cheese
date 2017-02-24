@@ -121,7 +121,7 @@ function Game()
         if (this.dragging)
         {
             // Place the piece down.
-            if (square != null && !square.hasPiece())
+            if (square != null && !square.hasPiece() && this.dragPiece.validMove(squareX, squareY))
             {
                 square.placePiece(this.dragPiece);
             }
