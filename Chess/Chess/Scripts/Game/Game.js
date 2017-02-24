@@ -123,12 +123,13 @@ function Game()
             // Place the piece down.
             if (square != null && !square.hasPiece())
             {
-                square.placePiece(this.dragPiece);
+                square.movePiece(this.dragPiece, this.dragStartSquare);
             }
             else
             {
                 // Invalid placement! Return it to its original position.
-                this.dragStartSquare.placePiece(this.dragPiece);
+                this.dragging = false;
+                this.dragStarteDquare = null;
             }
 
             this.dragging = false;
@@ -139,8 +140,8 @@ function Game()
         {
             // Start dragging this piece.
             this.dragging = true;
-            this.dragPiece = square.pickupPiece();
             this.dragStartSquare = square;
+            this.dragPiece = square.piece;
         }
     }
 
@@ -176,11 +177,11 @@ function Game()
         // Draw each grid square.
 		for (var x = 0; x < this.board.width; x += 1)
         {
-        	for (var y = 0; y < this.board.height; y += 1)
-        	{
-                this.drawBoardSquare(x, y);
-        	}
-        }
+		    for (var y = 0; y < this.board.height; y += 1)
+		    {
+		        this.drawBoardSquare(x, y);
+		    }
+		}
     }
 
     //-------------------------------------------------------------------------

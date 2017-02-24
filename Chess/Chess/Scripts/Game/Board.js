@@ -8,6 +8,7 @@ function BoardSquare(x, y)
 {
 	this.x = x;
 	this.y = y;
+	this.size = 64;
     this.piece = null;
 
     
@@ -25,6 +26,39 @@ function BoardSquare(x, y)
         this.piece = piece;
         piece.x = this.x;
         piece.y = this.y;
+    }
+    //--------------------------------------------------------------------------
+    // Animate the motion of a piece from its current location to this square
+    this.movePiece = function (piece, startSquare) {
+        var targetX = this.x;
+        var targetY = this.y;
+        var xDist = targetX - sourceX;
+        xDist = xDist * this.size;
+        var yDist = targetY - sourceY;
+        yDist = yDist * this.size;
+        var frames = Math.floor(Math.sqrt(xDist * xDist + yDist * yDist)));
+        var xRatio = xDist / yDist;
+        var yRation = yDist / xDist;
+        var xDisplace = xDist / (frames * xRatio);
+        var yDisplace = yDist / (frames * yRatio);
+        var pos = 0;
+        var id = setInterval(frame, 5);
+        var spr = piece.getSprite;
+        startSquare.piece = null;
+        function frame() {
+            if (pos == frames) {
+                clearInterval(id);
+            } 
+            else {
+                pos++;
+                spriteX += xDsiplace;
+                spriteY += yDisplace;
+                $("canvas").getContext("2d").draw(spr.image, spr.sourceX, spr.sourceY,
+					spr.sourceWidth, spr.sourceHeight, spriteX, spriteY,
+                    this.squareSize, this.squareSize)
+            }
+        }
+        this.piece = piece;
     }
 
     //-------------------------------------------------------------------------
