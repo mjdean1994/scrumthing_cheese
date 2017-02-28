@@ -1,25 +1,27 @@
 ﻿@model Chess.ViewModels.IndexViewModel
 
-<div class="row">
+<div class="row" id="preTeam">
+    <div class="col-xs-12 text-center">
+        <button name="black" class="btn btn-default btn-lg teamBtn">Black Team</button><br/><br />
+        <button name="white" class="btn btn-default btn-lg teamBtn">White Team</button><br/><br />
+        <button name="spectator" class="btn btn-default btn-lg teamBtn">Spectator</button>
+    </div>
+</div>
+
+<div class="row hidden" id="postTeam">
     <div class="col-lg-8 col-lg-offset-1">
-        <canvas id="canvas" style="width:100%;height:600px;background:blue;"></canvas>
+        <canvas id="canvas" style="width:100%;height:600px;"></canvas>
     </div>
     <div class="col-lg-2">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h2 class="panel-title">Chat</h2>
+                <h2 class="panel-title" id="chatLabel">Chat</h2>
             </div>
             <div class="panel-body">
                 <div id="chatMessages" style="height:500px;overflow-y:auto;">
-                    <div class="media">
-                        <div class="media-body">
-                            <h4 class="media-heading">Matt</h4>
-                            My name is Matt.
-                        </div>
-                    </div>
                 </div>
                 <input type="hidden" value="@Model.Username" id="username" />
-                <input type="hidden" value="white" id="team" />
+                <input type="hidden" id="team" />
                 <div class="input-group">
                     <input type="text" class="form-control" id="message" placeholder="Say something..." />
                     <span class="input-group-btn">
@@ -58,6 +60,9 @@
                 $('#chatMessages').append('<div class="media"><div class="media-body"><h4 class="media-heading">' + name
                     + '</h4>' + message + '</div></div>');
             };
+            chat.client.updateBoard = function (boardState) {
+                game.updateBoard(boardState);
+            }
 
             // Set initial focus to message input box.  
             $('#message').focus();
@@ -76,35 +81,54 @@
                         $("#sendChat").click();
                     }
                 })
+
+                updateServerBoard = function (boardState) {
+                    chat.server.updateBoard(boardState);
+                }
             });
-			
-            // Adjust the canvas's resolution to match its size.
-            canvas = document.getElementById("canvas");
-            canvas.width = canvas.clientWidth;
-            canvas.height = canvas.clientHeight;
-            context = canvas.getContext("2d");
 
-            // Initialize the game.
-            game.initialize(canvas);
-            
-            // Setup up input event handlers.
-            canvas.onmousemove = function (event) {
-                game.onMouseMove(event);
-            };
-            canvas.onmousedown = function (event) {
-                game.onMouseDown(event);
-            };
-            canvas.onmouseup = function (event) {
-                game.onMouseUp(event);
-            };
+            setupGame = function () {
+                // Adjust the canvas's resolution to match its size.
+                canvas = document.getElementById("canvas");
+                canvas.width = canvas.clientWidth;
+                canvas.height = canvas.clientHeight;
+                context = canvas.getContext("2d");
 
-            // Run the game.
-            var fps = 60;
-            var frameTime = 1 / fps;
-            setInterval(function() {
-                game.update();
-                game.draw();
-            }, frameTime);
+                // Initialize the game.
+                game.initialize(canvas);
+
+                // Setup up input event handlers.
+                canvas.onmousemove = function (event) {
+                    game.onMouseMove(event);
+                };
+                canvas.onmousedown = function (event) {
+                    game.onMouseDown(event);
+                };
+                canvas.onmouseup = function (event) {
+                    game.onMouseUp(event);
+                };
+
+                // Run the game.
+                var fps = 60;
+                var frameTime = 1 / fps;
+                setInterval(function () {
+                    game.update();
+                    game.draw();
+                }, frameTime);
+            }
+
+            $(".teamBtn").click(function () {
+                var name = this.name;
+                pickTeam(name)
+            })
+
+            pickTeam = function (team) {
+                $("#preTeam").addClass("hidden");
+                $("#postTeam").removeClass("hidden");
+                $("#team").val(team)
+                $("#chatLabel").text("Chat - " + team)
+                setupGame();
+            }
         });
 
     </script>
