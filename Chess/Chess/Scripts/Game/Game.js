@@ -152,6 +152,11 @@ function Game()
         return ($("#turn").val() == 1 && $("#team").val() == "black") || ($("#turn").val() == 0 && $("#team").val() == "white");
     }
 
+    this.CanMovePiece = function(piece)
+    {
+        return ($("#team").val() == "white" && piece.team == 0) || ($("#team").val() == "black" && piece.team == 1);
+    }
+
     //-------------------------------------------------------------------------
     // Called when a mouse button presses on the canvas.
     this.onMouseDown = function (event)
@@ -199,84 +204,7 @@ function Game()
 
                 square.placePiece(this.dragPiece);
 
-                var boardState = "";
-
-                for (var i = 0; i < 8; i++)
-                {
-                    for(var j = 0; j < 8; j++)
-                    {
-                        var square = game.board.getSquare(j, i);
-                        var piece = square.piece;
-                        
-                        if (!piece)
-                        {
-                            boardState += "0";
-                            continue;
-                        }
-
-                        var pieceName = piece.pieceType.name;
-                        var pieceTeam = piece.team;
-                        
-                        if(pieceName == "Pawn")
-                        {
-                            if(pieceTeam == 1)
-                            {
-                                boardState += "P";
-                            }
-                            else
-                            {
-                                boardState += "p";
-                            }
-                        }
-
-                        if (pieceName == "Knight") {
-                            if (pieceTeam == 1) {
-                                boardState += "N";
-                            }
-                            else {
-                                boardState += "n";
-                            }
-                        }
-
-                        if (pieceName == "Queen") {
-                            if (pieceTeam == 1) {
-                                boardState += "Q";
-                            }
-                            else {
-                                boardState += "q";
-                            }
-                        }
-
-                        if (pieceName == "King") {
-                            if (pieceTeam == 1) {
-                                boardState += "K";
-                            }
-                            else {
-                                boardState += "k";
-                            }
-                        }
-
-                        if (pieceName == "Bishop") {
-                            if (pieceTeam == 1) {
-                                boardState += "B";
-                            }
-                            else {
-                                boardState += "b";
-                            }
-                        }
-
-                        if (pieceName == "Rook") {
-                            if (pieceTeam == 1) {
-                                boardState += "R";
-                            }
-                            else {
-                                boardState += "r";
-                            }
-                        }
-                    }
-                }
-
-                updateServerBoard(boardState);
+                updateServerBoard(this.generateBoardState());
             }
             else
             {
@@ -291,12 +219,15 @@ function Game()
         }
         else if (square != null && square.hasPiece())
         {
-            // Start dragging this piece.
-            this.dragging = true;
-            this.dragPiece = square.pickupPiece();
-            this.dragStartSquare = square;
-            
-            this.validMoves = this.dragPiece.getValidMoves(this.board);
+            if (this.CanMovePiece(square.piece))
+            {
+                // Start dragging this piece.
+                this.dragging = true;
+                this.dragPiece = square.pickupPiece();
+                this.dragStartSquare = square;
+
+                this.validMoves = this.dragPiece.getValidMoves(this.board);
+            }
         }
     }
 
@@ -462,6 +393,82 @@ function Game()
 					this.squareSize, this.squareSize);
             }
 		}
+    }
+
+    this.generateBoardState = function()
+    {
+        var boardState = "";
+
+        for (var i = 0; i < 8; i++) {
+            for (var j = 0; j < 8; j++) {
+                var square = game.board.getSquare(j, i);
+                var piece = square.piece;
+
+                if (!piece) {
+                    boardState += "0";
+                    continue;
+                }
+
+                var pieceName = piece.pieceType.name;
+                var pieceTeam = piece.team;
+
+                if (pieceName == "Pawn") {
+                    if (pieceTeam == 1) {
+                        boardState += "P";
+                    }
+                    else {
+                        boardState += "p";
+                    }
+                }
+
+                if (pieceName == "Knight") {
+                    if (pieceTeam == 1) {
+                        boardState += "N";
+                    }
+                    else {
+                        boardState += "n";
+                    }
+                }
+
+                if (pieceName == "Queen") {
+                    if (pieceTeam == 1) {
+                        boardState += "Q";
+                    }
+                    else {
+                        boardState += "q";
+                    }
+                }
+
+                if (pieceName == "King") {
+                    if (pieceTeam == 1) {
+                        boardState += "K";
+                    }
+                    else {
+                        boardState += "k";
+                    }
+                }
+
+                if (pieceName == "Bishop") {
+                    if (pieceTeam == 1) {
+                        boardState += "B";
+                    }
+                    else {
+                        boardState += "b";
+                    }
+                }
+
+                if (pieceName == "Rook") {
+                    if (pieceTeam == 1) {
+                        boardState += "R";
+                    }
+                    else {
+                        boardState += "r";
+                    }
+                }
+            }
+        }
+
+        return boardState;
     }
 
 }
