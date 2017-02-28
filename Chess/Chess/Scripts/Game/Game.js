@@ -5,7 +5,9 @@
 //-----------------------------------------------------------------------------
 function Game()
 {
-	
+	// Set this to false for debugging purposes
+    this.EnableTurnBasedMovement = true;
+
     //-------------------------------------------------------------------------
     // Initialize a new game.
     this.initialize = function (canvas) 
@@ -145,10 +147,21 @@ function Game()
         return this.players[team];
     }
 
+    this.IsTurnToMove = function()
+    {
+        return ($("#turn").val() == 1 && $("#team").val() == "black") || ($("#turn").val() == 0 && $("#team").val() == "white");
+    }
+
     //-------------------------------------------------------------------------
     // Called when a mouse button presses on the canvas.
     this.onMouseDown = function (event)
     {
+        if (this.IsTurnToMove() && this.EnableTurnBasedMovement)
+        {
+            //if it isn't your turn to moved...do nothing
+            return;
+        }
+
         // Get the square location that was clicked on.
         var clientRect = canvas.getBoundingClientRect();
         var mouseX = Math.floor(event.clientX - clientRect.left) - this.boardPosX;

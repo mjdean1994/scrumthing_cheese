@@ -31,5 +31,11 @@ namespace Chess.Controllers
         {
             return Json(ChatHub.BoardState, JsonRequestBehavior.AllowGet);
         }
+
+        [HttpGet]
+        public JsonResult getTurn()
+        {
+            return Json(ChatHub.Turn, JsonRequestBehavior.AllowGet);
+        }
     }
 }

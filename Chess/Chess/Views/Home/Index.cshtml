@@ -22,6 +22,7 @@
                 </div>
                 <input type="hidden" value="@Model.Username" id="username" />
                 <input type="hidden" id="team" />
+                <input type="hidden" id="turn" />
                 <div class="input-group">
                     <input type="text" class="form-control" id="message" placeholder="Say something..." />
                     <span class="input-group-btn">
@@ -63,8 +64,9 @@
                         + '</h4>' + message + '</div></div>');
                 }
             };
-            chat.client.updateBoard = function (boardState) {
+            chat.client.updateBoard = function (boardState, turn) {
                 game.updateBoard(boardState);
+                $("#turn").val(turn);
             }
 
             // Set initial focus to message input box.  
@@ -85,7 +87,8 @@
                     }
                 })
 
-                updateServerBoard = function (boardState) {
+                updateServerBoard = function (boardState, Turn) {
+                    $("#turn").val(Turn);
                     chat.server.updateBoard(boardState);
                 }
             });
@@ -119,9 +122,15 @@
                     game.draw();
                 }, frameTime);
 
+                //I realize these could be one call and save some efficiency, but it's negligible here.
                 $.get("home/getBoardState")
                     .done(function (state) {
                         game.updateBoard(state);
+                    });
+
+                $.get("home/getTurn")
+                    .done(function (turn) {
+                        $("#turn").val(turn);
                     });
             }
 

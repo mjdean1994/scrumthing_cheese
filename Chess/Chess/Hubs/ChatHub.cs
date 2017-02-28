@@ -9,7 +9,7 @@ namespace Chess.Hubs
     public class ChatHub : Hub
     {
         public static string BoardState;
-
+        public static int Turn;
         public void Send(string name, string message, string team)
         {
             // Call the broadcastMessage method to update clients.
@@ -19,7 +19,15 @@ namespace Chess.Hubs
         public void UpdateBoard(string boardState)
         {
             BoardState = boardState;
-            Clients.All.updateBoard(boardState);
+            if(Turn == 1)
+            {
+                Turn = 0;
+            }
+            else
+            {
+                Turn = 1;
+            }
+            Clients.All.updateBoard(boardState, Turn);
         }
     }
 }
