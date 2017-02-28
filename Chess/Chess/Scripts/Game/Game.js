@@ -197,12 +197,11 @@ function Game()
     // Draw the game to the canvas.
     this.draw = function ()
     {
-        var boardRect = {
-            x: this.boardPosX,
-            y: this.boardPosY,
-            width: this.board.width * this.squareSize,
-            height: this.board.height * this.squareSize
-        }
+        var boardRect = new Rect(
+            this.boardPosX,
+            this.boardPosY,
+            this.board.width * this.squareSize,
+            this.board.height * this.squareSize);
 
         // Draw each grid square.
 		for (var x = 0; x < this.board.width; x += 1)
@@ -215,25 +214,23 @@ function Game()
         
         // Determine layout for capture boxes.
         var captureBox = [];
-        captureBox[0] = {
-            x: 0, y: boardRect.y,
-            width: boardRect.x, height: boardRect.height
-        };
-        captureBox[1] = {
-            x: boardRect.x + boardRect.width, y: boardRect.y,
-            width: boardRect.x, height: boardRect.height
-        };
-        captureGrowDir = [
-            { x: -1, y: 1 },
-            { x: 1, y: -1 }
-        ];
+        captureBox[0] = new Rect(
+            0, boardRect.y,
+            boardRect.x, boardRect.height);
+        captureBox[1] = new Rect(
+            boardRect.x + boardRect.width, boardRect.y,
+            boardRect.x, boardRect.height);
+        captureGrowDir = [ new Point(-1, 1),
+                           new Point(1, -1) ];
         
         // Draw captured pieces for each player.
         for (var p = 0; p < 2; p++)
         {
-            var captureLoc = { x: 0, y: 0 };
+            var player = this.getPlayer(p);
+            var numCapturePiecesPerRow = Math.floor(captureBox[p].width / this.squareSize);
 
-            var captureDrawPosBegin = { x: 0, y: 0 };
+            // Determine draw position of the first capture piece.
+            var captureDrawPosBegin = new Point(0, 0);
             captureDrawPosBegin.x = captureBox[p].x + captureBox[p].width - this.squareSize;
             captureDrawPosBegin.y = captureBox[p].y;
             if (p == 1)
@@ -241,17 +238,14 @@ function Game()
                 captureDrawPosBegin.x = captureBox[p].x;
                 captureDrawPosBegin.y = boardRect.y + captureBox[p].height - this.squareSize;
             }
-             
-            var numCapturePiecesPerRow = Math.floor(captureBox[p].width / this.squareSize);
         
             // Draw outline of capture box.
 		    this.context.strokeStyle = "red";
             this.context.strokeRect(captureBox[p].x, captureBox[p].y,
 			    captureBox[p].width, captureBox[p].height);
-
-            var player = this.getPlayer(p);
-            
+                        
             // Draw captured pieces inside capture box.
+            var captureLoc = { x: 0, y: 0 };
             for (var i = 0; i < player.piecesCaptured.length; i++)
             {
                 var piece = player.piecesCaptured[i];
