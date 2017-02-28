@@ -98,6 +98,54 @@ function Game()
         ];
     }
 
+    this.updateBoard(boardState)
+    {
+        for (var i = 0; i < 64; i++) {
+            var x = i % 8;
+            var y = i / 8;
+
+            if (boardState[i] == "P") {
+                this.board.placeNewPiece(x, y, Teams.black, this.pawn)
+            }
+            else if (boardState[i] == "p") {
+                this.board.placeNewPiece(x, y, Teams.white, this.pawn)
+            }
+            else if (boardState[i] == "K") {
+                this.board.placeNewPiece(x, y, Teams.black, this.king)
+            }
+            else if (boardState[i] == "k") {
+                this.board.placeNewPiece(x, y, Teams.white, this.king)
+            }
+            else if (boardState[i] == "Q") {
+                this.board.placeNewPiece(x, y, Teams.black, this.queen)
+            }
+            else if (boardState[i] == "q") {
+                this.board.placeNewPiece(x, y, Teams.white, this.queen)
+            }
+            else if (boardState[i] == "N") {
+                //Add knight for team 1
+            }
+            else if (boardState[i] == "n") {
+                //Add knight for team 2
+            }
+            else if (boardState[i] == "R") {
+                //Add rook for team 1
+            }
+            else if (boardState[i] == "r") {
+                //Add rook for team 2
+            }
+            else if (boardState[i] == "B") {
+                //Add bishop for team 1
+            }
+            else if (boardState[i] == "b") {
+                //Add bishop for team 2
+            }
+            else {
+                //empty square
+            }
+        }
+    }
+
     //-------------------------------------------------------------------------
     // Get the player who's on the given team.
     this.getPlayer = function (team)
@@ -138,6 +186,85 @@ function Game()
             if (square != null && !square.hasPiece() && isValidMove)//this.dragPiece.validMove(squareX, squareY))
             {
                 square.placePiece(this.dragPiece);
+
+                var boardState = "";
+
+                for (var i = 0; i < 8; i++)
+                {
+                    for(var j = 0; j < 8; j++)
+                    {
+                        var square = game.board.getSquare(j, i);
+                        var piece = square.piece;
+                        
+                        if (!piece)
+                        {
+                            boardState += "0";
+                            continue;
+                        }
+
+                        var pieceName = piece.pieceType.name;
+                        var pieceTeam = piece.team;
+                        
+                        if(pieceName == "Pawn")
+                        {
+                            if(pieceTeam == 1)
+                            {
+                                boardState += "P";
+                            }
+                            else
+                            {
+                                boardState += "p";
+                            }
+                        }
+
+                        if (pieceName == "Knight") {
+                            if (pieceTeam == 1) {
+                                boardState += "N";
+                            }
+                            else {
+                                boardState += "n";
+                            }
+                        }
+
+                        if (pieceName == "Queen") {
+                            if (pieceTeam == 1) {
+                                boardState += "Q";
+                            }
+                            else {
+                                boardState += "q";
+                            }
+                        }
+
+                        if (pieceName == "King") {
+                            if (pieceTeam == 1) {
+                                boardState += "K";
+                            }
+                            else {
+                                boardState += "k";
+                            }
+                        }
+
+                        if (pieceName == "Bishop") {
+                            if (pieceTeam == 1) {
+                                boardState += "B";
+                            }
+                            else {
+                                boardState += "b";
+                            }
+                        }
+
+                        if (pieceName == "Rook") {
+                            if (pieceTeam == 1) {
+                                boardState += "R";
+                            }
+                            else {
+                                boardState += "r";
+                            }
+                        }
+                    }
+                }
+
+                updateServerBoard(boardState);
             }
             else
             {
