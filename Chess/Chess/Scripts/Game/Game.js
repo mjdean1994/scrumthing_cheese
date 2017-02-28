@@ -135,8 +135,15 @@ function Game()
             }
 
             // Place the piece down.
-            if (square != null && !square.hasPiece() && isValidMove)//this.dragPiece.validMove(squareX, squareY))
+            if (square != null && isValidMove)
             {
+                if (square.hasPiece())
+                {
+                    // Capture!!!!
+                    var opponentTeam = this.getPlayer(1 - this.dragPiece.team);
+                    opponentTeam.piecesCaptured.push(square.pickupPiece());
+                }
+
                 square.placePiece(this.dragPiece);
             }
             else
@@ -190,6 +197,13 @@ function Game()
     // Draw the game to the canvas.
     this.draw = function ()
     {
+        var boardRect = {
+            x: this.boardPosX,
+            y: this.boardPosY,
+            width: this.board.width * this.squareSize,
+            height: this.board.height * this.squareSize
+        }
+
         // Draw each grid square.
 		for (var x = 0; x < this.board.width; x += 1)
         {
@@ -197,6 +211,70 @@ function Game()
         	{
                 this.drawBoardSquare(x, y);
         	}
+        }
+        
+        // Determine layout for capture boxes.
+        var captureBox = [];
+        captureBox[0] = {
+            x: 0, y: boardRect.y,
+            width: boardRect.x, height: boardRect.height
+        };
+        captureBox[1] = {
+            x: boardRect.x + boardRect.width, y: boardRect.y,
+            width: boardRect.x, height: boardRect.height
+        };
+        captureGrowDir = [
+            { x: -1, y: 1 },
+            { x: 1, y: -1 }
+        ];
+        
+        // Draw captured pieces for each player.
+        for (var p = 0; p < 2; p++)
+        {
+            var captureLoc = { x: 0, y: 0 };
+
+            var captureDrawPosBegin = { x: 0, y: 0 };
+            captureDrawPosBegin.x = captureBox[p].x + captureBox[p].width - this.squareSize;
+            captureDrawPosBegin.y = captureBox[p].y;
+            if (p == 1)
+            {
+                captureDrawPosBegin.x = captureBox[p].x;
+                captureDrawPosBegin.y = boardRect.y + captureBox[p].height - this.squareSize;
+            }
+             
+            var numCapturePiecesPerRow = Math.floor(captureBox[p].width / this.squareSize);
+        
+            // Draw outline of capture box.
+		    this.context.strokeStyle = "red";
+            this.context.strokeRect(captureBox[p].x, captureBox[p].y,
+			    captureBox[p].width, captureBox[p].height);
+
+            var player = this.getPlayer(p);
+            
+            // Draw captured pieces inside capture box.
+            for (var i = 0; i < player.piecesCaptured.length; i++)
+            {
+                var piece = player.piecesCaptured[i];
+                var spr = piece.getSprite(player.team);
+                var drawPosX = captureDrawPosBegin.x + (captureLoc.x * captureGrowDir[p].x * this.squareSize);
+                var drawPosY = captureDrawPosBegin.y + (captureLoc.y * captureGrowDir[p].y * this.squareSize);
+
+                // Draw the piece sprite.
+                if (spr != null && spr.image != null)
+                {
+				    this.context.drawImage(spr.image, spr.sourceX, spr.sourceY,
+					    spr.sourceWidth, spr.sourceHeight, drawPosX, drawPosY,
+                        this.squareSize, this.squareSize);
+                }
+
+                // Move to the draw next location.
+                captureLoc.x += 1;
+                if (captureLoc.x >= numCapturePiecesPerRow)
+                {
+                    captureLoc.x = 0;
+                    captureLoc.y += 1;
+                }
+            }
         }
     }
 
