@@ -98,7 +98,7 @@ function Game()
         ];
     }
 
-    this.updateBoard(boardState)
+    this.updateBoard = function(boardState)
     {
         for (var i = 0; i < 64; i++) {
             var x = i % 8;
