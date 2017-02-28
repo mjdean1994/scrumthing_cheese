@@ -102,46 +102,38 @@ function Game()
     {
         for (var i = 0; i < 64; i++) {
             var x = i % 8;
-            var y = i / 8;
+            var y = Math.floor(i / 8);
+            console.log(x + "," + y);
+            var team;
+            if (boardState[i] == boardState[i].toUpperCase())
+            {
+                team = Teams.black;
+            }
+            else
+            {
+                team = Teams.white;
+            }
 
-            if (boardState[i] == "P") {
-                this.board.placeNewPiece(x, y, Teams.black, this.pawn)
+            if (boardState[i] == "P" || boardState[i] == "p") {
+                this.board.placeNewPiece(x, y, team, this.pawn)
             }
-            else if (boardState[i] == "p") {
-                this.board.placeNewPiece(x, y, Teams.white, this.pawn)
+            else if (boardState[i] == "K" || boardState[i] == "k") {
+                this.board.placeNewPiece(x, y, team, this.king)
             }
-            else if (boardState[i] == "K") {
-                this.board.placeNewPiece(x, y, Teams.black, this.king)
+            else if (boardState[i] == "Q" || boardState[i] == "q") {
+                this.board.placeNewPiece(x, y, team, this.queen)
             }
-            else if (boardState[i] == "k") {
-                this.board.placeNewPiece(x, y, Teams.white, this.king)
+            else if (boardState[i] == "N" || boardState[i] == "n") {
+                this.board.placeNewPiece(x, y, team, this.knight)
             }
-            else if (boardState[i] == "Q") {
-                this.board.placeNewPiece(x, y, Teams.black, this.queen)
+            else if (boardState[i] == "R" || boardState[i] == "r") {
+                this.board.placeNewPiece(x, y, team, this.rook)
             }
-            else if (boardState[i] == "q") {
-                this.board.placeNewPiece(x, y, Teams.white, this.queen)
-            }
-            else if (boardState[i] == "N") {
-                //Add knight for team 1
-            }
-            else if (boardState[i] == "n") {
-                //Add knight for team 2
-            }
-            else if (boardState[i] == "R") {
-                //Add rook for team 1
-            }
-            else if (boardState[i] == "r") {
-                //Add rook for team 2
-            }
-            else if (boardState[i] == "B") {
-                //Add bishop for team 1
-            }
-            else if (boardState[i] == "b") {
-                //Add bishop for team 2
+            else if (boardState[i] == "B" || boardState[i] == "b") {
+                this.board.placeNewPiece(x, y, team, this.bishop)
             }
             else {
-                //empty square
+                this.board.getSquare(x,y).pickupPiece();
             }
         }
     }

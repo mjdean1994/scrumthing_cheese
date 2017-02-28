@@ -56,9 +56,12 @@
             var chat = $.connection.chatHub;
             // Create a function that the hub can call to broadcast messages.
             chat.client.broadcastMessage = function (name, message, team) {
-                // Add the message to the page. 
-                $('#chatMessages').append('<div class="media"><div class="media-body"><h4 class="media-heading">' + name
-                    + '</h4>' + message + '</div></div>');
+                if (team == $("#team").val())
+                {
+                    // Add the message to the page. 
+                    $('#chatMessages').append('<div class="media"><div class="media-body"><h4 class="media-heading">' + name
+                        + '</h4>' + message + '</div></div>');
+                }
             };
             chat.client.updateBoard = function (boardState) {
                 game.updateBoard(boardState);
@@ -115,6 +118,11 @@
                     game.update();
                     game.draw();
                 }, frameTime);
+
+                $.get("home/getBoardState")
+                    .done(function (state) {
+                        game.updateBoard(state);
+                    });
             }
 
             $(".teamBtn").click(function () {

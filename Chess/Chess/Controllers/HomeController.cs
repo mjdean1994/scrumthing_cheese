@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Chess.ViewModels;
+using Chess.Hubs;
 
 namespace Chess.Controllers
 {
@@ -23,6 +24,12 @@ namespace Chess.Controllers
 
             Random rng = new Random();
             return prefix[rng.Next(prefix.Length - 1)] + " " + suffix[rng.Next(suffix.Length - 1)];
+        }
+
+        [HttpGet]
+        public JsonResult getBoardState()
+        {
+            return Json(ChatHub.BoardState, JsonRequestBehavior.AllowGet);
         }
     }
 }
