@@ -32,6 +32,9 @@ function Game()
         this.initializePieceTypes();
         this.initializeBoard();
 
+        this.mousePosition = new Point(0, 0);
+        this.mouseBoardLocation = new Point(0, 0);
+
         this.validMoves = []; // Valid possible moves for selected chess piece.
     }
     
@@ -167,15 +170,10 @@ function Game()
             return;
         }
 
-        // Get the square location that was clicked on.
-        var clientRect = canvas.getBoundingClientRect();
-        var mouseX = Math.floor(event.clientX - clientRect.left) - this.boardPosX;
-        var mouseY = Math.floor(event.clientY - clientRect.top) - this.boardPosY;
-        var squareX = Math.floor(mouseX / this.squareSize);
-        var squareY = Math.floor(mouseY / this.squareSize);
-
-        // Check if there is a piece in this square.
-        var square = game.board.getSquare(squareX, squareY);
+        // Get the square that the mouse is hovering over.
+        var square = game.board.getSquare(
+            this.mouseBoardLocation.x,
+            this.mouseBoardLocation.y);
 
         // Check if we are picking up or placing down.
         if (this.dragging)
@@ -184,8 +182,8 @@ function Game()
             var isValidMove = false;
             for (var i = 0; i < this.validMoves.length; i++)
             {
-                if (this.validMoves[i].x == squareX &&
-                    this.validMoves[i].y == squareY)
+                if (this.validMoves[i].x == this.mouseBoardLocation.x &&
+                    this.validMoves[i].y == this.mouseBoardLocation.y)
                 {
                     isValidMove = true;
                     break;
@@ -241,6 +239,23 @@ function Game()
     // Called when the mouse is moved over the canvas.
     this.onMouseMove = function (event)
     {
+        // Update the mouse position and grid location.
+        var clientRect = canvas.getBoundingClientRect();
+        this.mousePosition = new Point(
+            Math.floor(event.clientX - clientRect.left),
+            Math.floor(event.clientY - clientRect.top));
+        this.mouseBoardLocation = new Point(
+            Math.floor((this.mousePosition.x - this.boardPosX) / this.squareSize),
+            Math.floor((this.mousePosition.y - this.boardPosY) / this.squareSize));
+
+        // Check if the mouse is hovering over a movable piece.
+        var square = game.board.getSquare(this.mouseBoardLocation.x, this.mouseBoardLocation.y);
+        if (square != null && square.hasPiece() && this.CanMovePiece(square.piece)) {
+            this.canvas.style.cursor = "pointer";
+        }
+        else {
+            this.canvas.style.cursor = "default";
+        }
     }
 
     //-------------------------------------------------------------------------
@@ -260,13 +275,36 @@ function Game()
     // Draw the game to the canvas.
     this.draw = function ()
     {
+        var border = this.squareSize * 0.25;
+        var captureBoxSize = new Point(200, 100);
+        
+        var backgroundRect = new Rect(0, 0, this.canvas.width, this.canvas.height);
+
         var boardRect = new Rect(
             this.boardPosX,
             this.boardPosY,
             this.board.width * this.squareSize,
             this.board.height * this.squareSize);
 
-        // Draw each grid square.
+        var boardRect2 = new Rect(
+            boardRect.x - border, boardRect.y - border,
+            boardRect.width + 2*border, boardRect.height + 2*border);
+        
+        // Draw canvas background.
+        var backgroundColor = "white";
+        this.fillRect(backgroundRect, backgroundColor);
+        
+        // Draw chess board border and background.
+		this.context.fillStyle = "#a06f3e";
+        this.context.fillRect(boardRect.x - border, boardRect.y - border,
+            boardRect.width + 2*border, boardRect.height + 2*border);
+		this.context.strokeStyle = "black";
+        this.context.strokeRect(boardRect.x - border, boardRect.y - border,
+            boardRect.width + 2*border, boardRect.height + 2*border);
+        this.context.strokeRect(boardRect.x, boardRect.y,
+            boardRect.width, boardRect.height);
+
+        // Draw each board square.
 		for (var x = 0; x < this.board.width; x += 1)
         {
         	for (var y = 0; y < this.board.height; y += 1)
@@ -278,13 +316,19 @@ function Game()
         // Determine layout for capture boxes.
         var captureBox = [];
         captureBox[0] = new Rect(
-            0, boardRect.y,
-            boardRect.x, boardRect.height);
+            0, boardRect2.y,
+            boardRect2.x, boardRect2.height);
         captureBox[1] = new Rect(
-            boardRect.x + boardRect.width, boardRect.y,
-            boardRect.x, boardRect.height);
+            boardRect2.x + boardRect2.width, boardRect2.y,
+            boardRect2.x, boardRect2.height);
+        captureBox[0] = new Rect(
+            boardRect2.x + boardRect2.width, boardRect2.y,
+            captureBoxSize.x, captureBoxSize.y);
+        captureBox[1] = new Rect(
+            boardRect2.x + boardRect2.width, boardRect2.y + boardRect2.height - captureBoxSize.y,
+            captureBoxSize.x, captureBoxSize.y);
         captureGrowDir = [ new Point(-1, 1),
-                           new Point(1, -1) ];
+                           new Point(-1, 1) ];
         
         // Draw captured pieces for each player.
         for (var p = 0; p < 2; p++)
@@ -302,8 +346,12 @@ function Game()
                 captureDrawPosBegin.y = boardRect.y + captureBox[p].height - this.squareSize;
             }
         
+            this.context.font = "30px Arial";
+            this.context.fillText("Hello World", captureBox[p].x, captureBox[p].y);
+
             // Draw outline of capture box.
 		    this.context.strokeStyle = "red";
+            this.context.textBaseline = "top";
             this.context.strokeRect(captureBox[p].x, captureBox[p].y,
 			    captureBox[p].width, captureBox[p].height);
                         
@@ -333,6 +381,24 @@ function Game()
                 }
             }
         }
+
+        // Draw dragged piece.
+        if (this.dragPiece != null) {
+            
+            this.drawPiece(this.dragPiece,
+                this.mousePosition.x - (this.squareSize / 2),
+                this.mousePosition.y - (this.squareSize / 2));
+        }
+    }
+
+    this.strokeRect = function(rect, color) {
+		this.context.strokeStyle = color;
+        this.context.strokeRect(rect.x, rect.y, rect.width, rect.height);
+    }
+
+    this.fillRect = function(rect, color) {
+		this.context.fillStyle = color;
+        this.context.fillRect(rect.x, rect.y, rect.width, rect.height);
     }
 
     //-------------------------------------------------------------------------
@@ -341,10 +407,15 @@ function Game()
     {
         var drawPosX = this.boardPosX + (x * this.squareSize);
         var drawPosY = this.boardPosY + (y * this.squareSize);
+        var squareRect = new Rect(drawPosX, drawPosY, this.squareSize, this.squareSize);
         		
         var square = this.board.grid[x][y];
 		var piece = square.piece;
         var isValidMove = false;
+
+        var squareColors = ["#f4d6b7", "#a06f3e"];
+        var squareMoveColors = ["#FFFF00", "#888800"];
+
 
         // Check if this square is in our list of valid moves.
         for (var i = 0; i < this.validMoves.length; i++)
@@ -358,41 +429,34 @@ function Game()
         }
 
 		// Draw the grid square background.
-		var isBlack = (y % 2 == 0 ? (x % 2 == 1) : (x % 2 == 0));
-        if (isValidMove)
-        {
-            if (piece != null)
-			    this.context.fillStyle = "red"; // capture move
+		var colorIndex = (y % 2 == 0 ? (x % 2) : (1 - (x % 2)));
+        this.fillRect(squareRect, squareColors[colorIndex]);
+
+        // Highlight valid move squares.
+        if (isValidMove) {
+            if (piece != null) {
+                this.fillRect(squareRect, "rgba(255, 0, 0, 0.5)"); // capture move
+                this.strokeRect(squareRect, "rgba(128, 0, 0, 1.0)");
+            }
             else
-			    this.context.fillStyle = "yellow";
+            {
+                this.fillRect(squareRect, "rgba(0, 255, 0, 0.5)");
+                this.strokeRect(squareRect, "rgba(0, 255, 0, 1.0)");
+            }
         }
-		else if (isBlack)
-			this.context.fillStyle = "gray";
-		else
-			this.context.fillStyle = "white";
-        this.context.fillRect(drawPosX, drawPosY,
-			this.squareSize, this.squareSize);
 
 		// Draw a chess piece that might be on this square.
 		if (piece != null)
-		{
-            var spr = piece.getSprite();
-            
-            // Draw the piece sprite.
-            if (spr != null && spr.image != null)
-            {
-				this.context.drawImage(spr.image, spr.sourceX, spr.sourceY,
-					spr.sourceWidth, spr.sourceHeight, drawPosX, drawPosY,
-                    this.squareSize, this.squareSize);
-            }
-            else
-            {
-                // Error: image not found! Draw a yellow square instead.
-				this.context.fillStyle = "yellow";
-        		this.context.fillRect(drawPosX, drawPosY,
-					this.squareSize, this.squareSize);
-            }
-		}
+            this.drawPiece(piece, drawPosX, drawPosY);
+    }
+
+    this.drawPiece = function(piece, x, y) {
+        var spr = piece.getSprite();
+        if (spr != null && spr.image != null) {
+			this.context.drawImage(spr.image, spr.sourceX, spr.sourceY,
+				spr.sourceWidth, spr.sourceHeight, x, y,
+                this.squareSize, this.squareSize);
+        }
     }
 
     this.generateBoardState = function()
