@@ -1,6 +1,44 @@
 ﻿
 
 //-----------------------------------------------------------------------------
+// ChessStyle
+//-----------------------------------------------------------------------------
+function ChessStyle()
+{
+    this.backgroundColor              = "white";
+
+    this.boardBorderScale             = 0.25;
+    this.boardColorDark               = "#a06f3e";
+    this.boardColorLight              = "#f4d6b7";
+    this.boardOutlineColor            = "black";
+
+    this.squareColors                 = ["#f4d6b7", "#a06f3e"];
+    this.squareMoveColors             = ["#FFFF00", "#888800"];
+    
+    this.squareCaptureMoveColor        = "rgba(255, 0, 0, 0.5)";
+    this.squareCaptureMoveOutlineColor = "rgba(128, 0, 0, 1.0)";
+    this.squareMoveColor               = "rgba(0, 255, 0, 0.5)";
+    this.squareMoveOutlineColor        = "rgba(0, 255, 0, 1.0)";
+
+    this.captureBoxSize               = new Point(240, 140);
+    this.captureBoxOffset             = 20;
+    this.captureBoxBorder             = 6;
+    this.captureBoxTitleHeight        = 20;
+    this.capturePieceSize             = 30;
+    this.capturePieceSpacing          = 2;
+    this.captureBoxBorderColor        = "#f4d6b7";
+    this.captureBoxBorderColorOnTurn  = "#aaffaa";
+    this.captureBoxOutlineColor       = "black";
+    this.captureBoxBackgroundColor    = "white";
+    this.teamNameFont                 = "16px Arial";
+    this.teamNameColor                = "black";
+                                    
+    this.turnTextFont                 = "24px Arial";
+    this.turnTextColor                = "black";
+}
+
+
+//-----------------------------------------------------------------------------
 // Game
 //-----------------------------------------------------------------------------
 function Game()
@@ -14,6 +52,8 @@ function Game()
     {
         this.canvas = canvas;
         this.context = canvas.getContext("2d");
+
+        this.style = new ChessStyle();
 
         this.squareSize = 64;
         this.boardPosX = 0;
@@ -300,37 +340,23 @@ function Game()
     // Update the game for a single frame.
     this.update = function ()
     {
+        this.canvas.width = this.canvas.clientWidth;
+        this.canvas.height = this.canvas.clientHeight;
+
         // Adjust board position and size based on canvas size.
         // Board is made to be centered in the canvas.
-        this.squareSize = Math.floor((context.canvas.height / this.board.height) * 0.9);
+        this.squareSize = Math.floor((this.canvas.height / this.board.height) * 0.9);
         var boardWidth = this.squareSize * this.board.width;
         var boardHeight = this.squareSize * this.board.height;
-        this.boardPosX = Math.floor((context.canvas.width - boardWidth) / 2);
-        this.boardPosY = Math.floor((context.canvas.height - boardHeight) / 2);
+        this.boardPosX = Math.floor((this.canvas.width - boardWidth) / 2);
+        this.boardPosY = Math.floor((this.canvas.height - boardHeight) / 2);
     }
 
     //-------------------------------------------------------------------------
     // Draw the game to the canvas.
     this.draw = function ()
     {
-        var border = this.squareSize * 0.25;
-        var captureBoxSize = new Point(240, 140);
-        var captureBoxOffset = 20;
-        var captureBoxBorder = 6;
-        var captureBoxTitleHeight = 20;
-        var capturePieceSize = 30;
-        var capturePieceSpacing = 2;
-        var captureBoxBorderColor = "#f4d6b7";
-        var captureBoxBorderColorOnTurn = "#aaffaa";
-        var captureBoxBackgroundColor = "white";
-        var backgroundColor = "white";
-        var boardColorDark = "#a06f3e";
-        var boardColorLight = "#f4d6b7";
-        var boardOutlineColor = "black";
-        var teamNameFont = "16px Arial";
-        var teamNameColor = "black";
-        var turnTextFont = "24px Arial";
-        var turnTextColor = "black";
+        var border = this.squareSize * this.style.boardBorderScale;
 
         var backgroundRect = new Rect(0, 0,
             this.canvas.width, this.canvas.height);
@@ -346,25 +372,25 @@ function Game()
 
         var captureBox = [
             new Rect(
-                boardRectBorder.x + boardRectBorder.width + captureBoxOffset,
+                boardRectBorder.x + boardRectBorder.width + this.style.captureBoxOffset,
                 boardRectBorder.y,
-                captureBoxSize.x,
-                captureBoxSize.y),
+                this.style.captureBoxSize.x,
+                this.style.captureBoxSize.y),
             new Rect(
-                boardRectBorder.x + boardRectBorder.width + captureBoxOffset,
-                boardRectBorder.y + boardRectBorder.height - captureBoxSize.y,
-                captureBoxSize.x,
-                captureBoxSize.y)
+                boardRectBorder.x + boardRectBorder.width + this.style.captureBoxOffset,
+                boardRectBorder.y + boardRectBorder.height - this.style.captureBoxSize.y,
+                this.style.captureBoxSize.x,
+                this.style.captureBoxSize.y)
         ];
         
         //---------------------------------------------------------------------
         // Draw chess board.
 
         // Clear canvas background.
-        this.fillRect(backgroundRect, backgroundColor);
+        this.fillRect(backgroundRect, this.style.backgroundColor);
         
         // Draw chess board background.
-        this.fillRect(boardRectBorder, boardColorDark);
+        this.fillRect(boardRectBorder, this.style.boardColorDark);
 
         // Draw each board square.
 		for (var x = 0; x < this.board.width; x += 1)
@@ -381,8 +407,8 @@ function Game()
         }
 
         // Draw chess board outlines.
-        this.strokeRect(boardRect, boardOutlineColor);
-        this.strokeRect(boardRectBorder, boardOutlineColor);
+        this.strokeRect(boardRect, this.style.boardOutlineColor);
+        this.strokeRect(boardRectBorder, this.style.boardOutlineColor);
 
         //---------------------------------------------------------------------
         // Draw text for whose turn it is.
@@ -390,13 +416,17 @@ function Game()
         var turnTextPos = new Point(
             captureBox[0].x + (captureBox[0].width / 2),
             boardRectBorder.y + (boardRectBorder.height / 2))
+        turnTextPos.y = captureBox[0].y + captureBox[0].height + 40;
 
         var turnText = "Opponent's Turn";
         if (this.getPlayerTurn() == this.getMyTeam())
+        {
             turnText = "Your Turn";
+            turnTextPos.y = captureBox[1].y - 40;
+        }
 
-        this.context.font = turnTextFont;
-        this.context.fillStyle = turnTextColor;
+        this.context.font = this.style.turnTextFont;
+        this.context.fillStyle = this.style.turnTextColor;
         this.context.textBaseline = "middle";
         this.context.textAlign = "center";
         this.context.fillText(turnText, turnTextPos.x, turnTextPos.y);
@@ -422,45 +452,33 @@ function Game()
     // Draw a capture box for the given player.
     this.drawCaptureBox = function(rect, team)
     {
-        var captureBoxSize = new Point(240, 140);
-        var captureBoxOffset = 20;
-        var captureBoxBorder = 6;
-        var captureBoxTitleHeight = 20;
-        var capturePieceSize = 30;
-        var capturePieceSpacing = 2;
-        var captureBoxBorderColor = "#f4d6b7";
-        var captureBoxBorderColorOnTurn = "#aaffaa";
-        var captureBoxBackgroundColor = "white";
-        var teamNameFont = "16px Arial";
-        var teamNameColor = "black";
-
         var player = this.getPlayer(team);
 
         // Draw capture box background & border.
         this.fillRect(rect, this.getPlayerTurn() == team ?
-            captureBoxBorderColorOnTurn : captureBoxBorderColor);
+            this.style.captureBoxBorderColorOnTurn : this.style.captureBoxBorderColor);
         var innerRect = new Rect(
-            rect.x + captureBoxBorder,
-            rect.y + captureBoxTitleHeight,
-            rect.width - (2 * captureBoxBorder),
-            rect.height - captureBoxBorder - captureBoxTitleHeight);
-        this.fillRect(innerRect, captureBoxBackgroundColor);
-        this.strokeRect(rect, "black");
-        this.strokeRect(innerRect, "black");
+            rect.x + this.style.captureBoxBorder,
+            rect.y + this.style.captureBoxTitleHeight,
+            rect.width - (2 * this.style.captureBoxBorder),
+            rect.height - this.style.captureBoxBorder - this.style.captureBoxTitleHeight);
+        this.fillRect(innerRect, this.style.captureBoxBackgroundColor);
+        this.strokeRect(rect, this.style.captureBoxOutlineColor);
+        this.strokeRect(innerRect, this.style.captureBoxOutlineColor);
         
         // Draw team name.
-        this.context.font = teamNameFont;
-        this.context.fillStyle = teamNameColor;
+        this.context.font = this.style.teamNameFont;
+        this.context.fillStyle = this.style.teamNameColor;
         this.context.textBaseline = "middle";
         this.context.textAlign = "left";
         this.context.fillText(player.name,
-            rect.x + captureBoxBorder,
-            rect.y + (captureBoxTitleHeight / 2));
+            rect.x + this.style.captureBoxBorder,
+            rect.y + (this.style.captureBoxTitleHeight / 2));
 
         // Draw captured pieces inside capture box.
         var drawPos = new Point(
-            capturePieceSpacing / 2,
-            capturePieceSpacing / 2);
+            this.style.capturePieceSpacing / 2,
+            this.style.capturePieceSpacing / 2);
         for (var i = 0; i < player.piecesCaptured.length; i++)
         {
             // Draw the piece sprite.
@@ -473,16 +491,16 @@ function Game()
 					spr.sourceWidth, spr.sourceHeight,
                     innerRect.x + drawPos.x,
                     innerRect.y + drawPos.y,
-                    capturePieceSize, capturePieceSize);
+                    this.style.capturePieceSize, this.style.capturePieceSize);
             }
 
             // Move to the next draw position.
-            drawPos.x += capturePieceSize + capturePieceSpacing;
-            if (drawPos.x + capturePieceSize +
-                (capturePieceSpacing / 2) >= innerRect.width)
+            drawPos.x += this.style.capturePieceSize + this.style.capturePieceSpacing;
+            if (drawPos.x + this.style.capturePieceSize +
+                (this.style.capturePieceSpacing / 2) >= innerRect.width)
             {
                 drawPos.x = 0;
-                drawPos.y += capturePieceSize + capturePieceSpacing;
+                drawPos.y += this.style.capturePieceSize + this.style.capturePieceSpacing;
             }
         }
     }
