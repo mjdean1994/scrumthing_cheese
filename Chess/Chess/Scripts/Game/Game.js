@@ -36,6 +36,8 @@ function Game()
         this.mouseBoardLocation = new Point(0, 0);
 
         this.validMoves = []; // Valid possible moves for selected chess piece.
+
+        this.myTurn = false;
     }
     
     //-------------------------------------------------------------------------
@@ -103,6 +105,7 @@ function Game()
         ];
     }
 
+    //-------------------------------------------------------------------------
     this.updateBoard = function(boardState)
     {
         for (var i = 0; i < 64; i++) {
@@ -150,6 +153,12 @@ function Game()
         return this.players[team];
     }
 
+    // Get whose turn it is currently.
+    this.getPlayerTurn = function()
+    {
+        return $("#turn").val();
+    }
+
     this.IsTurnToMove = function()
     {
         return ($("#turn").val() == 1 && $("#team").val() == "black") || ($("#turn").val() == 0 && $("#team").val() == "white");
@@ -164,7 +173,7 @@ function Game()
     // Called when a mouse button presses on the canvas.
     this.onMouseDown = function (event)
     {
-        if (this.IsTurnToMove() && this.EnableTurnBasedMovement)
+        if (!this.IsTurnToMove() && this.EnableTurnBasedMovement)
         {
             //if it isn't your turn to moved...do nothing
             return;
@@ -223,7 +232,6 @@ function Game()
                 this.dragging = true;
                 this.dragPiece = square.pickupPiece();
                 this.dragStartSquare = square;
-
                 this.validMoves = this.dragPiece.getValidMoves(this.board);
             }
         }
@@ -239,7 +247,7 @@ function Game()
     // Called when the mouse is moved over the canvas.
     this.onMouseMove = function (event)
     {
-        // Update the mouse position and grid location.
+        // Update the mouse position and board-square location.
         var clientRect = canvas.getBoundingClientRect();
         this.mousePosition = new Point(
             Math.floor(event.clientX - clientRect.left),
@@ -248,12 +256,17 @@ function Game()
             Math.floor((this.mousePosition.x - this.boardPosX) / this.squareSize),
             Math.floor((this.mousePosition.y - this.boardPosY) / this.squareSize));
 
-        // Check if the mouse is hovering over a movable piece.
-        var square = game.board.getSquare(this.mouseBoardLocation.x, this.mouseBoardLocation.y);
-        if (square != null && square.hasPiece() && this.CanMovePiece(square.piece)) {
+        // Change the cursor if the mouse is hovering over a movable piece.
+        var square = game.board.getSquare(
+            this.mouseBoardLocation.x,
+            this.mouseBoardLocation.y);
+        if (square != null && square.hasPiece() &&
+            this.CanMovePiece(square.piece))
+        {
             this.canvas.style.cursor = "pointer";
         }
-        else {
+        else
+        {
             this.canvas.style.cursor = "default";
         }
     }
@@ -283,9 +296,19 @@ function Game()
         var capturePieceSize = 30;
         var capturePieceSpacing = 2;
         var captureBoxBorderColor = "#f4d6b7";
+        var captureBoxBorderColorOnTurn = "#aaffaa";
         var captureBoxBackgroundColor = "white";
+        var backgroundColor = "white";
+        var boardColorDark = "#a06f3e";
+        var boardColorLight = "#f4d6b7";
+        var boardOutlineColor = "black";
+        var teamNameFont = "16px Arial";
+        var teamNameColor = "black";
+        var turnTextFont = "24px Arial";
+        var turnTextColor = "black";
 
-        var backgroundRect = new Rect(0, 0, this.canvas.width, this.canvas.height);
+        var backgroundRect = new Rect(0, 0,
+            this.canvas.width, this.canvas.height);
 
         var boardRect = new Rect(
             this.boardPosX,
@@ -309,15 +332,14 @@ function Game()
                 captureBoxSize.y)
         ];
         
-        // Draw canvas background.
-        var backgroundColor = "white";
+        //---------------------------------------------------------------------
+        // Draw chess board.
+
+        // Clear canvas background.
         this.fillRect(backgroundRect, backgroundColor);
         
-        // Draw chess board border and background.
-		this.context.fillStyle = "#a06f3e";
-        this.context.fillRect(boardRect.x - border, boardRect.y - border,
-            boardRect.width + 2*border, boardRect.height + 2*border);
-		this.context.strokeStyle = "black";
+        // Draw chess board background.
+        this.fillRect(boardRectBorder, boardColorDark);
 
         // Draw each board square.
 		for (var x = 0; x < this.board.width; x += 1)
@@ -329,27 +351,38 @@ function Game()
         }
 
         // Draw chess board outlines.
-        this.strokeRect(boardRect, "black");
-        this.strokeRect(boardRectBorder, "black");
-        
+        this.strokeRect(boardRect, boardOutlineColor);
+        this.strokeRect(boardRectBorder, boardOutlineColor);
+
+        //---------------------------------------------------------------------
+        // Draw text for whose turn it is.
+
+        var turnTextPos = new Point(
+            captureBox[0].x + (captureBox[0].width / 2),
+            boardRectBorder.y + (boardRectBorder.height / 2))
+
+        var turnText = "Opponent's Turn";
+        if (this.IsTurnToMove())
+        {
+            turnText = "Your Turn";
+        }
+
+        this.context.font = turnTextFont;
+        this.context.fillStyle = turnTextColor;
+        this.context.textBaseline = "middle";
+        this.context.textAlign = "center";
+        this.context.fillText(turnText, turnTextPos.x, turnTextPos.y);
+                
+        //---------------------------------------------------------------------
         // Draw captured pieces for each player.
+
         for (var p = 0; p < 2; p++)
         {
             var player = this.getPlayer(p);
-            var numCapturePiecesPerRow = Math.floor(captureBox[p].width / this.squareSize);
-
-            // Determine draw position of the first capture piece.
-            var captureDrawPosBegin = new Point(0, 0);
-            captureDrawPosBegin.x = captureBox[p].x + captureBox[p].width - this.squareSize;
-            captureDrawPosBegin.y = captureBox[p].y;
-            if (p == 1)
-            {
-                captureDrawPosBegin.x = captureBox[p].x;
-                captureDrawPosBegin.y = boardRect.y + captureBox[p].height - this.squareSize;
-            }
 
             // Draw capture box background & border.
-            this.fillRect(captureBox[p], captureBoxBorderColor);
+            this.fillRect(captureBox[p], this.getPlayerTurn() == p ?
+                captureBoxBorderColorOnTurn : captureBoxBorderColor);
             var captureBoxInsideRect = new Rect(
                 captureBox[p].x + captureBoxBorder,
                 captureBox[p].y + captureBoxTitleHeight,
@@ -359,16 +392,19 @@ function Game()
             this.strokeRect(captureBox[p], "black");
             this.strokeRect(captureBoxInsideRect, "black");
         
-            // Draw player name.
-            this.context.font = "16px Arial";
-            this.context.fillStyle = "black";
+            // Draw team name.
+            this.context.font = teamNameFont;
+            this.context.fillStyle = teamNameColor;
             this.context.textBaseline = "middle";
+            this.context.textAlign = "left";
             this.context.fillText(player.name,
                 captureBox[p].x + captureBoxBorder,
                 captureBox[p].y + (captureBoxTitleHeight / 2));
 
             // Draw captured pieces inside capture box.
-            var drawPos = new Point(capturePieceSpacing / 2, capturePieceSpacing / 2);
+            var drawPos = new Point(
+                capturePieceSpacing / 2,
+                capturePieceSpacing / 2);
             for (var i = 0; i < player.piecesCaptured.length; i++)
             {
                 // Draw the piece sprite.
@@ -376,15 +412,18 @@ function Game()
                 var spr = piece.getSprite(player.team);
                 if (spr != null && spr.image != null)
                 {
-				    this.context.drawImage(spr.image, spr.sourceX, spr.sourceY,
+				    this.context.drawImage(spr.image,
+                        spr.sourceX, spr.sourceY,
 					    spr.sourceWidth, spr.sourceHeight,
-                        captureBoxInsideRect.x + drawPos.x, captureBoxInsideRect.y + drawPos.y,
+                        captureBoxInsideRect.x + drawPos.x,
+                        captureBoxInsideRect.y + drawPos.y,
                         capturePieceSize, capturePieceSize);
                 }
 
-                // Move to the draw next position.
+                // Move to the next draw position.
                 drawPos.x += capturePieceSize + capturePieceSpacing;
-                if (drawPos.x + capturePieceSize + (capturePieceSpacing / 2) >= captureBoxInsideRect.width)
+                if (drawPos.x + capturePieceSize +
+                    (capturePieceSpacing / 2) >= captureBoxInsideRect.width)
                 {
                     drawPos.x = 0;
                     drawPos.y += capturePieceSize + capturePieceSpacing;
@@ -392,7 +431,9 @@ function Game()
             }
         }
 
+        //---------------------------------------------------------------------
         // Draw dragged piece.
+
         if (this.dragPiece != null) {
             
             this.drawPiece(this.dragPiece,
