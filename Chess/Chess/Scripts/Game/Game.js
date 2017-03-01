@@ -159,6 +159,30 @@ function Game()
         return $("#turn").val();
     }
 
+    // Get which team I am on.
+    this.getMyTeam = function()
+    {
+        if ($("#team").val() == "black")
+            return Teams.black;
+        return Teams.white;
+    }
+
+    // Get which team I am on.
+    this.getOpponentTeam = function()
+    {
+        return (1 - this.getMyTeam());
+    }
+
+    // Get the board location after accouning for rotation. A player will
+    // always see their board rotated such that their side is at the bottom.
+    this.getRotatedBoardLocation = function(location)
+    {
+        if ($("#team").val() == "black")
+            return new Point(this.board.width - 1 - location.x, this.board.height - 1 - location.y);
+        else
+            return new Point(location.x, location.y);
+    }
+
     this.IsTurnToMove = function()
     {
         return ($("#turn").val() == 1 && $("#team").val() == "black") || ($("#turn").val() == 0 && $("#team").val() == "white");
@@ -255,6 +279,7 @@ function Game()
         this.mouseBoardLocation = new Point(
             Math.floor((this.mousePosition.x - this.boardPosX) / this.squareSize),
             Math.floor((this.mousePosition.y - this.boardPosY) / this.squareSize));
+        this.mouseBoardLocation = this.getRotatedBoardLocation(this.mouseBoardLocation);
 
         // Change the cursor if the mouse is hovering over a movable piece.
         var square = game.board.getSquare(
@@ -346,7 +371,12 @@ function Game()
         {
         	for (var y = 0; y < this.board.height; y += 1)
         	{
-                this.drawBoardSquare(x, y);
+                var squareRect = new Rect(
+                    this.boardPosX + (x * this.squareSize),
+                    this.boardPosY + (y * this.squareSize),
+                    this.squareSize, this.squareSize);
+                var squareLocation = this.getRotatedBoardLocation(new Point(x, y));
+                this.drawBoardSquare(squareLocation.x, squareLocation.y, squareRect);
         	}
         }
 
@@ -362,10 +392,8 @@ function Game()
             boardRectBorder.y + (boardRectBorder.height / 2))
 
         var turnText = "Opponent's Turn";
-        if (this.IsTurnToMove())
-        {
+        if (this.getPlayerTurn() == this.getMyTeam())
             turnText = "Your Turn";
-        }
 
         this.context.font = turnTextFont;
         this.context.fillStyle = turnTextColor;
@@ -374,62 +402,10 @@ function Game()
         this.context.fillText(turnText, turnTextPos.x, turnTextPos.y);
                 
         //---------------------------------------------------------------------
-        // Draw captured pieces for each player.
-
-        for (var p = 0; p < 2; p++)
-        {
-            var player = this.getPlayer(p);
-
-            // Draw capture box background & border.
-            this.fillRect(captureBox[p], this.getPlayerTurn() == p ?
-                captureBoxBorderColorOnTurn : captureBoxBorderColor);
-            var captureBoxInsideRect = new Rect(
-                captureBox[p].x + captureBoxBorder,
-                captureBox[p].y + captureBoxTitleHeight,
-                captureBox[p].width - (2 * captureBoxBorder),
-                captureBox[p].height - captureBoxBorder - captureBoxTitleHeight);
-            this.fillRect(captureBoxInsideRect, captureBoxBackgroundColor);
-            this.strokeRect(captureBox[p], "black");
-            this.strokeRect(captureBoxInsideRect, "black");
+        // Draw player boxes with captured pieces for each player.
         
-            // Draw team name.
-            this.context.font = teamNameFont;
-            this.context.fillStyle = teamNameColor;
-            this.context.textBaseline = "middle";
-            this.context.textAlign = "left";
-            this.context.fillText(player.name,
-                captureBox[p].x + captureBoxBorder,
-                captureBox[p].y + (captureBoxTitleHeight / 2));
-
-            // Draw captured pieces inside capture box.
-            var drawPos = new Point(
-                capturePieceSpacing / 2,
-                capturePieceSpacing / 2);
-            for (var i = 0; i < player.piecesCaptured.length; i++)
-            {
-                // Draw the piece sprite.
-                var piece = player.piecesCaptured[i];
-                var spr = piece.getSprite(player.team);
-                if (spr != null && spr.image != null)
-                {
-				    this.context.drawImage(spr.image,
-                        spr.sourceX, spr.sourceY,
-					    spr.sourceWidth, spr.sourceHeight,
-                        captureBoxInsideRect.x + drawPos.x,
-                        captureBoxInsideRect.y + drawPos.y,
-                        capturePieceSize, capturePieceSize);
-                }
-
-                // Move to the next draw position.
-                drawPos.x += capturePieceSize + capturePieceSpacing;
-                if (drawPos.x + capturePieceSize +
-                    (capturePieceSpacing / 2) >= captureBoxInsideRect.width)
-                {
-                    drawPos.x = 0;
-                    drawPos.y += capturePieceSize + capturePieceSpacing;
-                }
-            }
-        }
+        this.drawCaptureBox(captureBox[0], this.getOpponentTeam());
+        this.drawCaptureBox(captureBox[1], this.getMyTeam());
 
         //---------------------------------------------------------------------
         // Draw dragged piece.
@@ -443,13 +419,78 @@ function Game()
     }
 
     //-------------------------------------------------------------------------
-    // Draw the board square at the given location.
-    this.drawBoardSquare = function (x, y)
+    // Draw a capture box for the given player.
+    this.drawCaptureBox = function(rect, team)
     {
-        var drawPosX = this.boardPosX + (x * this.squareSize);
-        var drawPosY = this.boardPosY + (y * this.squareSize);
-        var squareRect = new Rect(drawPosX, drawPosY, this.squareSize, this.squareSize);
-        		
+        var captureBoxSize = new Point(240, 140);
+        var captureBoxOffset = 20;
+        var captureBoxBorder = 6;
+        var captureBoxTitleHeight = 20;
+        var capturePieceSize = 30;
+        var capturePieceSpacing = 2;
+        var captureBoxBorderColor = "#f4d6b7";
+        var captureBoxBorderColorOnTurn = "#aaffaa";
+        var captureBoxBackgroundColor = "white";
+        var teamNameFont = "16px Arial";
+        var teamNameColor = "black";
+
+        var player = this.getPlayer(team);
+
+        // Draw capture box background & border.
+        this.fillRect(rect, this.getPlayerTurn() == team ?
+            captureBoxBorderColorOnTurn : captureBoxBorderColor);
+        var innerRect = new Rect(
+            rect.x + captureBoxBorder,
+            rect.y + captureBoxTitleHeight,
+            rect.width - (2 * captureBoxBorder),
+            rect.height - captureBoxBorder - captureBoxTitleHeight);
+        this.fillRect(innerRect, captureBoxBackgroundColor);
+        this.strokeRect(rect, "black");
+        this.strokeRect(innerRect, "black");
+        
+        // Draw team name.
+        this.context.font = teamNameFont;
+        this.context.fillStyle = teamNameColor;
+        this.context.textBaseline = "middle";
+        this.context.textAlign = "left";
+        this.context.fillText(player.name,
+            rect.x + captureBoxBorder,
+            rect.y + (captureBoxTitleHeight / 2));
+
+        // Draw captured pieces inside capture box.
+        var drawPos = new Point(
+            capturePieceSpacing / 2,
+            capturePieceSpacing / 2);
+        for (var i = 0; i < player.piecesCaptured.length; i++)
+        {
+            // Draw the piece sprite.
+            var piece = player.piecesCaptured[i];
+            var spr = piece.getSprite(player.team);
+            if (spr != null && spr.image != null)
+            {
+				this.context.drawImage(spr.image,
+                    spr.sourceX, spr.sourceY,
+					spr.sourceWidth, spr.sourceHeight,
+                    innerRect.x + drawPos.x,
+                    innerRect.y + drawPos.y,
+                    capturePieceSize, capturePieceSize);
+            }
+
+            // Move to the next draw position.
+            drawPos.x += capturePieceSize + capturePieceSpacing;
+            if (drawPos.x + capturePieceSize +
+                (capturePieceSpacing / 2) >= innerRect.width)
+            {
+                drawPos.x = 0;
+                drawPos.y += capturePieceSize + capturePieceSpacing;
+            }
+        }
+    }
+
+    //-------------------------------------------------------------------------
+    // Draw the board square at the given location.
+    this.drawBoardSquare = function (x, y, squareRect)
+    {
         var square = this.board.grid[x][y];
 		var piece = square.piece;
         var isValidMove = false;
@@ -488,7 +529,7 @@ function Game()
 
 		// Draw a chess piece that might be on this square.
 		if (piece != null)
-            this.drawPiece(piece, drawPosX, drawPosY);
+            this.drawPiece(piece, squareRect.x, squareRect.y);
     }
 
     //-------------------------------------------------------------------------
