@@ -13,9 +13,10 @@ Teams = {
 //-----------------------------------------------------------------------------
 // Player
 //-----------------------------------------------------------------------------
-function Player(team)
+function Player(team, name)
 {
     this.team = team;
+    this.name = name;
 
     // List of my pieces which are currently in play.
     this.piecesInPlay = [];

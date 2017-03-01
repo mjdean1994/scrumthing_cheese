@@ -23,8 +23,8 @@ function Game()
         this.dragStartSquare = null;
 
         this.players = [
-            new Player(Teams.white),
-            new Player(Teams.black)
+            new Player(Teams.white, "Player White"),
+            new Player(Teams.black, "Player Black")
         ];
 
         this.board = new ChessBoard();
@@ -276,8 +276,15 @@ function Game()
     this.draw = function ()
     {
         var border = this.squareSize * 0.25;
-        var captureBoxSize = new Point(200, 100);
-        
+        var captureBoxSize = new Point(240, 140);
+        var captureBoxOffset = 20;
+        var captureBoxBorder = 6;
+        var captureBoxTitleHeight = 20;
+        var capturePieceSize = 30;
+        var capturePieceSpacing = 2;
+        var captureBoxBorderColor = "#f4d6b7";
+        var captureBoxBackgroundColor = "white";
+
         var backgroundRect = new Rect(0, 0, this.canvas.width, this.canvas.height);
 
         var boardRect = new Rect(
@@ -285,10 +292,22 @@ function Game()
             this.boardPosY,
             this.board.width * this.squareSize,
             this.board.height * this.squareSize);
-
-        var boardRect2 = new Rect(
+        var boardRectBorder = new Rect(
             boardRect.x - border, boardRect.y - border,
             boardRect.width + 2*border, boardRect.height + 2*border);
+
+        var captureBox = [
+            new Rect(
+                boardRectBorder.x + boardRectBorder.width + captureBoxOffset,
+                boardRectBorder.y,
+                captureBoxSize.x,
+                captureBoxSize.y),
+            new Rect(
+                boardRectBorder.x + boardRectBorder.width + captureBoxOffset,
+                boardRectBorder.y + boardRectBorder.height - captureBoxSize.y,
+                captureBoxSize.x,
+                captureBoxSize.y)
+        ];
         
         // Draw canvas background.
         var backgroundColor = "white";
@@ -299,10 +318,6 @@ function Game()
         this.context.fillRect(boardRect.x - border, boardRect.y - border,
             boardRect.width + 2*border, boardRect.height + 2*border);
 		this.context.strokeStyle = "black";
-        this.context.strokeRect(boardRect.x - border, boardRect.y - border,
-            boardRect.width + 2*border, boardRect.height + 2*border);
-        this.context.strokeRect(boardRect.x, boardRect.y,
-            boardRect.width, boardRect.height);
 
         // Draw each board square.
 		for (var x = 0; x < this.board.width; x += 1)
@@ -312,23 +327,10 @@ function Game()
                 this.drawBoardSquare(x, y);
         	}
         }
-        
-        // Determine layout for capture boxes.
-        var captureBox = [];
-        captureBox[0] = new Rect(
-            0, boardRect2.y,
-            boardRect2.x, boardRect2.height);
-        captureBox[1] = new Rect(
-            boardRect2.x + boardRect2.width, boardRect2.y,
-            boardRect2.x, boardRect2.height);
-        captureBox[0] = new Rect(
-            boardRect2.x + boardRect2.width, boardRect2.y,
-            captureBoxSize.x, captureBoxSize.y);
-        captureBox[1] = new Rect(
-            boardRect2.x + boardRect2.width, boardRect2.y + boardRect2.height - captureBoxSize.y,
-            captureBoxSize.x, captureBoxSize.y);
-        captureGrowDir = [ new Point(-1, 1),
-                           new Point(-1, 1) ];
+
+        // Draw chess board outlines.
+        this.strokeRect(boardRect, "black");
+        this.strokeRect(boardRectBorder, "black");
         
         // Draw captured pieces for each player.
         for (var p = 0; p < 2; p++)
@@ -345,39 +347,47 @@ function Game()
                 captureDrawPosBegin.x = captureBox[p].x;
                 captureDrawPosBegin.y = boardRect.y + captureBox[p].height - this.squareSize;
             }
-        
-            this.context.font = "30px Arial";
-            this.context.fillText("Hello World", captureBox[p].x, captureBox[p].y);
 
-            // Draw outline of capture box.
-		    this.context.strokeStyle = "red";
-            this.context.textBaseline = "top";
-            this.context.strokeRect(captureBox[p].x, captureBox[p].y,
-			    captureBox[p].width, captureBox[p].height);
-                        
+            // Draw capture box background & border.
+            this.fillRect(captureBox[p], captureBoxBorderColor);
+            var captureBoxInsideRect = new Rect(
+                captureBox[p].x + captureBoxBorder,
+                captureBox[p].y + captureBoxTitleHeight,
+                captureBox[p].width - (2 * captureBoxBorder),
+                captureBox[p].height - captureBoxBorder - captureBoxTitleHeight);
+            this.fillRect(captureBoxInsideRect, captureBoxBackgroundColor);
+            this.strokeRect(captureBox[p], "black");
+            this.strokeRect(captureBoxInsideRect, "black");
+        
+            // Draw player name.
+            this.context.font = "16px Arial";
+            this.context.fillStyle = "black";
+            this.context.textBaseline = "middle";
+            this.context.fillText(player.name,
+                captureBox[p].x + captureBoxBorder,
+                captureBox[p].y + (captureBoxTitleHeight / 2));
+
             // Draw captured pieces inside capture box.
-            var captureLoc = { x: 0, y: 0 };
+            var drawPos = new Point(capturePieceSpacing / 2, capturePieceSpacing / 2);
             for (var i = 0; i < player.piecesCaptured.length; i++)
             {
+                // Draw the piece sprite.
                 var piece = player.piecesCaptured[i];
                 var spr = piece.getSprite(player.team);
-                var drawPosX = captureDrawPosBegin.x + (captureLoc.x * captureGrowDir[p].x * this.squareSize);
-                var drawPosY = captureDrawPosBegin.y + (captureLoc.y * captureGrowDir[p].y * this.squareSize);
-
-                // Draw the piece sprite.
                 if (spr != null && spr.image != null)
                 {
 				    this.context.drawImage(spr.image, spr.sourceX, spr.sourceY,
-					    spr.sourceWidth, spr.sourceHeight, drawPosX, drawPosY,
-                        this.squareSize, this.squareSize);
+					    spr.sourceWidth, spr.sourceHeight,
+                        captureBoxInsideRect.x + drawPos.x, captureBoxInsideRect.y + drawPos.y,
+                        capturePieceSize, capturePieceSize);
                 }
 
-                // Move to the draw next location.
-                captureLoc.x += 1;
-                if (captureLoc.x >= numCapturePiecesPerRow)
+                // Move to the draw next position.
+                drawPos.x += capturePieceSize + capturePieceSpacing;
+                if (drawPos.x + capturePieceSize + (capturePieceSpacing / 2) >= captureBoxInsideRect.width)
                 {
-                    captureLoc.x = 0;
-                    captureLoc.y += 1;
+                    drawPos.x = 0;
+                    drawPos.y += capturePieceSize + capturePieceSpacing;
                 }
             }
         }
@@ -389,16 +399,6 @@ function Game()
                 this.mousePosition.x - (this.squareSize / 2),
                 this.mousePosition.y - (this.squareSize / 2));
         }
-    }
-
-    this.strokeRect = function(rect, color) {
-		this.context.strokeStyle = color;
-        this.context.strokeRect(rect.x, rect.y, rect.width, rect.height);
-    }
-
-    this.fillRect = function(rect, color) {
-		this.context.fillStyle = color;
-        this.context.fillRect(rect.x, rect.y, rect.width, rect.height);
     }
 
     //-------------------------------------------------------------------------
@@ -450,6 +450,8 @@ function Game()
             this.drawPiece(piece, drawPosX, drawPosY);
     }
 
+    //-------------------------------------------------------------------------
+    // Draw a single chess piece at the given position.
     this.drawPiece = function(piece, x, y) {
         var spr = piece.getSprite();
         if (spr != null && spr.image != null) {
@@ -457,6 +459,17 @@ function Game()
 				spr.sourceWidth, spr.sourceHeight, x, y,
                 this.squareSize, this.squareSize);
         }
+    }
+    
+    //-------------------------------------------------------------------------
+    this.strokeRect = function(rect, color) {
+		this.context.strokeStyle = color;
+        this.context.strokeRect(rect.x, rect.y, rect.width, rect.height);
+    }
+
+    this.fillRect = function(rect, color) {
+		this.context.fillStyle = color;
+        this.context.fillRect(rect.x, rect.y, rect.width, rect.height);
     }
 
     this.generateBoardState = function()
