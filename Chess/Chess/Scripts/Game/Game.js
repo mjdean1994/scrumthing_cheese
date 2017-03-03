@@ -44,7 +44,7 @@ function ChessStyle()
 function Game()
 {
 	// Set this to false for debugging purposes
-    this.EnableTurnBasedMovement = true;
+    this.EnableTurnBasedMovement = false;
 
     //-------------------------------------------------------------------------
     // Initialize a new game.
@@ -52,6 +52,8 @@ function Game()
     {
         this.canvas = canvas;
         this.context = canvas.getContext("2d");
+
+        this.moveLog = new MoveLog();
 
         this.style = new ChessStyle();
 
@@ -90,12 +92,12 @@ function Game()
 	    image.src = "ChessPieces.png";
 
         // Create piece types.
-        this.queen  = new ChessPieceType("Queen",  new Sprite(image, 0 * s, 1 * s, s, s), new Sprite(image, 0 * s, 0 * s, s, s));
-        this.king   = new ChessPieceType("King",   new Sprite(image, 1 * s, 1 * s, s, s), new Sprite(image, 1 * s, 0 * s, s, s));
-        this.rook   = new ChessPieceType("Rook",   new Sprite(image, 2 * s, 1 * s, s, s), new Sprite(image, 2 * s, 0 * s, s, s));
-        this.knight = new ChessPieceType("Knight", new Sprite(image, 3 * s, 1 * s, s, s), new Sprite(image, 3 * s, 0 * s, s, s));
-        this.bishop = new ChessPieceType("Bishop", new Sprite(image, 4 * s, 1 * s, s, s), new Sprite(image, 4 * s, 0 * s, s, s));
-        this.pawn   = new ChessPieceType("Pawn",   new Sprite(image, 5 * s, 1 * s, s, s), new Sprite(image, 5 * s, 0 * s, s, s));
+        this.queen  = new ChessPieceType("Queen",  Pieces.queen,  new Sprite(image, 0 * s, 1 * s, s, s), new Sprite(image, 0 * s, 0 * s, s, s));
+        this.king   = new ChessPieceType("King",   Pieces.king,   new Sprite(image, 1 * s, 1 * s, s, s), new Sprite(image, 1 * s, 0 * s, s, s));
+        this.rook   = new ChessPieceType("Rook",   Pieces.rook,   new Sprite(image, 2 * s, 1 * s, s, s), new Sprite(image, 2 * s, 0 * s, s, s));
+        this.knight = new ChessPieceType("Knight", Pieces.knight, new Sprite(image, 3 * s, 1 * s, s, s), new Sprite(image, 3 * s, 0 * s, s, s));
+        this.bishop = new ChessPieceType("Bishop", Pieces.bishop, new Sprite(image, 4 * s, 1 * s, s, s), new Sprite(image, 4 * s, 0 * s, s, s));
+        this.pawn   = new ChessPieceType("Pawn",   Pieces.pawn,   new Sprite(image, 5 * s, 1 * s, s, s), new Sprite(image, 5 * s, 0 * s, s, s));
     }
     
     //-------------------------------------------------------------------------
@@ -151,7 +153,7 @@ function Game()
         for (var i = 0; i < 64; i++) {
             var x = i % 8;
             var y = Math.floor(i / 8);
-            console.log(x + "," + y);
+
             var team;
             if (boardState[i] == boardState[i].toUpperCase())
             {
@@ -239,7 +241,7 @@ function Game()
     {
         if (!this.IsTurnToMove() && this.EnableTurnBasedMovement)
         {
-            //if it isn't your turn to moved...do nothing
+            //if it isn't your turn to move...do nothing
             return;
         }
 
@@ -266,16 +268,31 @@ function Game()
             // Place the piece down.
             if (square != null && isValidMove)
             {
+                var move = new Move();
+                move.moveNumber = 1;
+                move.team = this.dragPiece.team;
+                move.piece = this.dragPiece.pieceType.pieceLetter;
+                move.from = new Point(this.dragStartSquare.x,
+                                      this.dragStartSquare.y);
+                move.to = new Point(this.mouseBoardLocation.x,
+                                    this.mouseBoardLocation.y);
+
+                // Check for capturing a piece piece.
                 if (square.hasPiece())
                 {
-                    // Capture!!!!
+                    var capturedPiece = square.pickupPiece();
                     var opponentTeam = this.getPlayer(1 - this.dragPiece.team);
-                    opponentTeam.piecesCaptured.push(square.pickupPiece());
+                    opponentTeam.piecesCaptured.push(capturedPiece);
+                    move.capturePiece = capturedPiece.pieceType.pieceLetter;
                 }
+
+                this.moveLog.addMove(move);
+                console.log(this.moveLog.toString());
 
                 square.placePiece(this.dragPiece);
 
                 updateServerBoard(this.generateBoardState());
+
             }
             else
             {
@@ -305,35 +322,6 @@ function Game()
     // Called when a mouse button releases on the canvas.
     this.onMouseUp = function (event)
     {
-        var move = new Move();
-        move.moveNumber = 2;
-        move.piece = Pieces.pawn;
-        move.team = Teams.white;
-        move.from = new Point(2, 6);
-        move.to = new Point(2, 7);
-        //move.capturePiece = Pieces.bishop;
-        //move.check = true;
-        //move.checkmate = false;
-        //move.castling = false;
-        //move.promotePiece = Pieces.queen;
-
-        if (Math.random() < 0.5)
-            move.check = true;
-        if (Math.random() < 0.5)
-            move.checkmate = true;
-        if (Math.random() < 0.5)
-            move.castling = true;
-        if (Math.random() < 0.5)
-            move.capturePiece = "B";
-        if (Math.random() < 0.5)
-            move.promotePiece = "Q";
-
-        console.log(Notation.getMoveNotation(move));
-
-        var str = Notation.getMoveNotation(move);
-
-        move = Notation.parseMove(str);
-        console.log(Notation.getMoveNotation(move));
     }
 
     //-------------------------------------------------------------------------

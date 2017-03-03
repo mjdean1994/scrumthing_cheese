@@ -18,8 +18,9 @@ Pieces = {
 // ChessPieceType - A unique piece type that a chess piece can be.
 //                  (Pawn, Rook, Bishop, Knight, King, Queen)
 //-------------------------------------------------------------------------
-function ChessPieceType(name, spriteWhite, spriteBlack) {
+function ChessPieceType(name, pieceLetter, spriteWhite, spriteBlack) {
     this.name = name;
+    this.pieceLetter = pieceLetter;
     this.spriteWhite = spriteWhite;
     this.spriteBlack = spriteBlack;
 }

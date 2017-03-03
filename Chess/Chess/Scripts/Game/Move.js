@@ -15,33 +15,33 @@ function Move() {
     this.check        = false;
     this.checkmate    = false;
     this.castling     = false;
-
-
-    //-----------------------------------------------------------------------------
-    // Return the string notation for this move.
-    // This omits the move number and team.
-    this.getNotation = function() {
-        var result = "";
-        
-        result += this.piece;
-        result += Notation.pointNotation(this.from);
-        result += Notation.pointNotation(this.to);
-
-        if (this.promotePiece != Pieces.none)
-            result += "=" + this.promotePiece;
-        if (this.capturePiece != Pieces.none)
-            result += "x" + this.capturePiece;
-        if (this.checkmate)
-            result += "#";
-        else if (this.check)
-            result += "+";
-
-        if (this.castling) {
-
-        }
-        
-        return result;
-    };
 }
 
+
+
+//-----------------------------------------------------------------------------
+// MoveLog - stores a list of all moves for a single chess game.
+//-----------------------------------------------------------------------------
+function MoveLog()
+{
+    this.moves = [];
+
+    //-------------------------------------------------------------------------
+    // Add a move to the log.
+    this.addMove = function (move) {
+        this.moves.push(move);
+    }
+
+    
+}
+
+
+// Convert a move log to a string, with move notations.
+MoveLog.prototype.toString = function () {
+    var str = "";
+    for (var i = 0; i < this.moves.length; i++) {
+        str += Notation.getMoveNotation(this.moves[i]) + " ";
+    }
+    return str;
+}
 

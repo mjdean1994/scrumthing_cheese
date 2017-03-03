@@ -84,5 +84,11 @@ function ChessBoard()
         this.grid[x][y].piece = piece;
         return piece;
     }
+
+    //-------------------------------------------------------------------------
+    // Piece a new piece of the given type at the given location.
+    this.setupNewGame = function ()
+    {
+    }
 }
 
