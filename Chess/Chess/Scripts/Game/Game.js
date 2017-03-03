@@ -305,6 +305,35 @@ function Game()
     // Called when a mouse button releases on the canvas.
     this.onMouseUp = function (event)
     {
+        var move = new Move();
+        move.moveNumber = 2;
+        move.piece = Pieces.pawn;
+        move.team = Teams.white;
+        move.from = new Point(2, 6);
+        move.to = new Point(2, 7);
+        //move.capturePiece = Pieces.bishop;
+        //move.check = true;
+        //move.checkmate = false;
+        //move.castling = false;
+        //move.promotePiece = Pieces.queen;
+
+        if (Math.random() < 0.5)
+            move.check = true;
+        if (Math.random() < 0.5)
+            move.checkmate = true;
+        if (Math.random() < 0.5)
+            move.castling = true;
+        if (Math.random() < 0.5)
+            move.capturePiece = "B";
+        if (Math.random() < 0.5)
+            move.promotePiece = "Q";
+
+        console.log(Notation.getMoveNotation(move));
+
+        var str = Notation.getMoveNotation(move);
+
+        move = Notation.parseMove(str);
+        console.log(Notation.getMoveNotation(move));
     }
 
     //-------------------------------------------------------------------------
