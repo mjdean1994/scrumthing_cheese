@@ -91,7 +91,7 @@
 
                 updateServerBoard = function (boardState, Turn) {
                     $("#turn").val(Turn);
-                    chat.server.updateBoard(boardState);
+                    //chat.server.updateBoard(boardState);
                 }
             });
 
@@ -127,7 +127,7 @@
                 //I realize these could be one call and save some efficiency, but it's negligible here.
                 $.get("home/getBoardState")
                     .done(function (state) {
-                        game.updateBoard(state);
+                        //game.updateBoard(state);
                     });
 
                 $.get("home/getTurn")

@@ -4,6 +4,41 @@
 // Pieces - has the string representations of all chess pieces.
 //-------------------------------------------------------------------------
 Pieces = {
+
+    none: -1,
+    pawn: 0,
+    rook: 1,
+    knight: 2,
+    bishop: 3,
+    king: 4,
+    queen: 5,
+    count: 6,
+
+    letters: ["P", "R", "K", "B", "K", "Q"],
+    names: ["Pawn", "Rook", "King", "Bishop", "King", "Queen"],
+    
+    //-----------------------------------------------------------------------
+    // Get the letter for the given piece index (ex: Pieces.bishop --> "B")
+    getLetter: function(pieceIndex) {
+        if (pieceIndex == Pieces.none)
+            return "";
+        return Pieces.letters[pieceIndex];
+    },
+
+    //-----------------------------------------------------------------------
+    // Get the name for the given piece index (ex: Pieces.pawn --> "Pawn")
+    getName: function(pieceIndex) {
+        if (pieceIndex == Pieces.none)
+            return "";
+        return Pieces.names[pieceIndex];
+    }
+};
+
+
+//-------------------------------------------------------------------------
+// PieceLetters - has the letter representations for all chess pieces.
+//-------------------------------------------------------------------------
+PieceLetters = {
     none: "",
     pawn: "P",
     rook: "R",
@@ -11,27 +46,7 @@ Pieces = {
     bishop: "B",
     king: "K",
     queen: "Q",
-};
-
-
-//-------------------------------------------------------------------------
-// ChessPieceType - A unique piece type that a chess piece can be.
-//                  (Pawn, Rook, Bishop, Knight, King, Queen)
-//-------------------------------------------------------------------------
-function ChessPieceType(name, pieceLetter, spriteWhite, spriteBlack) {
-    this.name = name;
-    this.pieceLetter = pieceLetter;
-    this.spriteWhite = spriteWhite;
-    this.spriteBlack = spriteBlack;
 }
-
-//-------------------------------------------------------------------------
-// Move - Represents a move to a specific location.
-//-------------------------------------------------------------------------
-//function Move(x, y) {
-    //this.x = x;
-    //this.y = y;
-//}
 
 //-------------------------------------------------------------------------
 // ChessPiece - An instance of a chess piece in the game.
@@ -45,35 +60,35 @@ function ChessPiece(pieceType, team, x, y) {
 
     //---------------------------------------------------------------------
     // Get the sprite for this chess piece.
-    this.getSprite = function () {
+    /*this.getSprite = function () {
         if (this.team == Teams.white)
             return this.pieceType.spriteWhite;
         else if (this.team == Teams.black)
             return this.pieceType.spriteBlack;
         return null;
-    }
+    }*/
 
     //---------------------------------------------------------------------
     // Get a list of valid moves this piece can make given the board state.
     this.getValidMoves = function (board) {
         var moves = [];
-        switch (this.pieceType.name) {
-            case "Pawn":
+        switch (this.pieceType) {
+            case Pieces.pawn:
                 moves = this.pawnMove(board);
                 break;
-            case "Knight":
+            case Pieces.knight:
                 moves = this.knightMove(board);
                 break;
-            case "Bishop":
+            case Pieces.bishop:
                 moves = this.bishopMove(board);
                 break;
-            case "Rook":
+            case Pieces.rook:
                 moves = this.rookMove(board);
                 break;
-            case "Queen":
+            case Pieces.queen:
                 moves = this.rookMove(board).concat(this.bishopMove(board));
                 break;
-            case "King":
+            case Pieces.king:
                 moves = this.kingMove(board);
             default:
                 return moves;

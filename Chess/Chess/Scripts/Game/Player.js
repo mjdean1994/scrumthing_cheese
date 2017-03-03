@@ -24,4 +24,9 @@ function Player(team, name)
     // List of my opponent's pieces that I have captured.
     this.piecesCaptured = [];
 
+    
+    this.reset = function() {
+        this.piecesInPlay = [];
+        this.piecesCaptured = [];
+    };
 }

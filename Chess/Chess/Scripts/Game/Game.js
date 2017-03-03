@@ -63,6 +63,9 @@ function Game()
         this.dragging = false;
         this.dragPiece = null;
         this.dragStartSquare = null;
+        
+        this.pieceSpritesWhite = [];
+        this.pieceSpritesBlack = [];
 
         this.players = [
             new Player(Teams.white, "Player White"),
@@ -91,59 +94,70 @@ function Game()
 	    var image = new Image();
 	    image.src = "ChessPieces.png";
 
-        // Create piece types.
-        this.queen  = new ChessPieceType("Queen",  Pieces.queen,  new Sprite(image, 0 * s, 1 * s, s, s), new Sprite(image, 0 * s, 0 * s, s, s));
-        this.king   = new ChessPieceType("King",   Pieces.king,   new Sprite(image, 1 * s, 1 * s, s, s), new Sprite(image, 1 * s, 0 * s, s, s));
-        this.rook   = new ChessPieceType("Rook",   Pieces.rook,   new Sprite(image, 2 * s, 1 * s, s, s), new Sprite(image, 2 * s, 0 * s, s, s));
-        this.knight = new ChessPieceType("Knight", Pieces.knight, new Sprite(image, 3 * s, 1 * s, s, s), new Sprite(image, 3 * s, 0 * s, s, s));
-        this.bishop = new ChessPieceType("Bishop", Pieces.bishop, new Sprite(image, 4 * s, 1 * s, s, s), new Sprite(image, 4 * s, 0 * s, s, s));
-        this.pawn   = new ChessPieceType("Pawn",   Pieces.pawn,   new Sprite(image, 5 * s, 1 * s, s, s), new Sprite(image, 5 * s, 0 * s, s, s));
+        // Create piece sprites.
+        this.pieceSpritesWhite = new Array(Pieces.count);
+        this.pieceSpritesWhite[Pieces.queen]  = new Sprite(image, 0 * s, 1 * s, s, s);
+        this.pieceSpritesWhite[Pieces.king]   = new Sprite(image, 1 * s, 1 * s, s, s);
+        this.pieceSpritesWhite[Pieces.rook]   = new Sprite(image, 2 * s, 1 * s, s, s);
+        this.pieceSpritesWhite[Pieces.knight] = new Sprite(image, 3 * s, 1 * s, s, s);
+        this.pieceSpritesWhite[Pieces.bishop] = new Sprite(image, 4 * s, 1 * s, s, s);
+        this.pieceSpritesWhite[Pieces.pawn]   = new Sprite(image, 5 * s, 1 * s, s, s);
+        this.pieceSpritesBlack = new Array(Pieces.count);
+        this.pieceSpritesBlack[Pieces.queen]  = new Sprite(image, 0 * s, 0 * s, s, s);
+        this.pieceSpritesBlack[Pieces.king]   = new Sprite(image, 1 * s, 0 * s, s, s);
+        this.pieceSpritesBlack[Pieces.rook]   = new Sprite(image, 2 * s, 0 * s, s, s);
+        this.pieceSpritesBlack[Pieces.knight] = new Sprite(image, 3 * s, 0 * s, s, s);
+        this.pieceSpritesBlack[Pieces.bishop] = new Sprite(image, 4 * s, 0 * s, s, s);
+        this.pieceSpritesBlack[Pieces.pawn]   = new Sprite(image, 5 * s, 0 * s, s, s);
     }
     
     //-------------------------------------------------------------------------
     // Setup the board with pieces laid out for a new game.
     this.initializeBoard = function ()
     {
+        //this.getPlayer(Teams.white).reset();
+        //this.getPlayer(Teams.black).reset();
+
         // Place pieces onto the board for the black player.
         this.getPlayer(Teams.black).piecesInPlay =
         [
-            this.board.placeNewPiece(0, 0, Teams.black, this.rook),
-            this.board.placeNewPiece(1, 0, Teams.black, this.knight),
-            this.board.placeNewPiece(2, 0, Teams.black, this.bishop),
-            this.board.placeNewPiece(3, 0, Teams.black, this.queen),
-            this.board.placeNewPiece(4, 0, Teams.black, this.king),
-            this.board.placeNewPiece(5, 0, Teams.black, this.bishop),
-            this.board.placeNewPiece(6, 0, Teams.black, this.knight),
-            this.board.placeNewPiece(7, 0, Teams.black, this.rook),
-            this.board.placeNewPiece(0, 1, Teams.black, this.pawn),
-            this.board.placeNewPiece(1, 1, Teams.black, this.pawn),
-            this.board.placeNewPiece(2, 1, Teams.black, this.pawn),
-            this.board.placeNewPiece(3, 1, Teams.black, this.pawn),
-            this.board.placeNewPiece(4, 1, Teams.black, this.pawn),
-            this.board.placeNewPiece(5, 1, Teams.black, this.pawn),
-            this.board.placeNewPiece(6, 1, Teams.black, this.pawn),
-            this.board.placeNewPiece(7, 1, Teams.black, this.pawn)
+            this.board.placeNewPiece(0, 0, Teams.black, Pieces.rook),
+            this.board.placeNewPiece(1, 0, Teams.black, Pieces.knight),
+            this.board.placeNewPiece(2, 0, Teams.black, Pieces.bishop),
+            this.board.placeNewPiece(3, 0, Teams.black, Pieces.queen),
+            this.board.placeNewPiece(4, 0, Teams.black, Pieces.king),
+            this.board.placeNewPiece(5, 0, Teams.black, Pieces.bishop),
+            this.board.placeNewPiece(6, 0, Teams.black, Pieces.knight),
+            this.board.placeNewPiece(7, 0, Teams.black, Pieces.rook),
+            this.board.placeNewPiece(0, 1, Teams.black, Pieces.pawn),
+            this.board.placeNewPiece(1, 1, Teams.black, Pieces.pawn),
+            this.board.placeNewPiece(2, 1, Teams.black, Pieces.pawn),
+            this.board.placeNewPiece(3, 1, Teams.black, Pieces.pawn),
+            this.board.placeNewPiece(4, 1, Teams.black, Pieces.pawn),
+            this.board.placeNewPiece(5, 1, Teams.black, Pieces.pawn),
+            this.board.placeNewPiece(6, 1, Teams.black, Pieces.pawn),
+            this.board.placeNewPiece(7, 1, Teams.black, Pieces.pawn)
         ];
 
         // Place pieces onto the board for the white player.
         this.getPlayer(Teams.white).piecesInPlay =
         [
-            this.board.placeNewPiece(0, 7, Teams.white, this.rook),
-            this.board.placeNewPiece(1, 7, Teams.white, this.knight),
-            this.board.placeNewPiece(2, 7, Teams.white, this.bishop),
-            this.board.placeNewPiece(3, 7, Teams.white, this.queen),
-            this.board.placeNewPiece(4, 7, Teams.white, this.king),
-            this.board.placeNewPiece(5, 7, Teams.white, this.bishop),
-            this.board.placeNewPiece(6, 7, Teams.white, this.knight),
-            this.board.placeNewPiece(7, 7, Teams.white, this.rook),
-            this.board.placeNewPiece(0, 6, Teams.white, this.pawn),
-            this.board.placeNewPiece(1, 6, Teams.white, this.pawn),
-            this.board.placeNewPiece(2, 6, Teams.white, this.pawn),
-            this.board.placeNewPiece(3, 6, Teams.white, this.pawn),
-            this.board.placeNewPiece(4, 6, Teams.white, this.pawn),
-            this.board.placeNewPiece(5, 6, Teams.white, this.pawn),
-            this.board.placeNewPiece(6, 6, Teams.white, this.pawn),
-            this.board.placeNewPiece(7, 6, Teams.white, this.pawn)
+            this.board.placeNewPiece(0, 7, Teams.white, Pieces.rook),
+            this.board.placeNewPiece(1, 7, Teams.white, Pieces.knight),
+            this.board.placeNewPiece(2, 7, Teams.white, Pieces.bishop),
+            this.board.placeNewPiece(3, 7, Teams.white, Pieces.queen),
+            this.board.placeNewPiece(4, 7, Teams.white, Pieces.king),
+            this.board.placeNewPiece(5, 7, Teams.white, Pieces.bishop),
+            this.board.placeNewPiece(6, 7, Teams.white, Pieces.knight),
+            this.board.placeNewPiece(7, 7, Teams.white, Pieces.rook),
+            this.board.placeNewPiece(0, 6, Teams.white, Pieces.pawn),
+            this.board.placeNewPiece(1, 6, Teams.white, Pieces.pawn),
+            this.board.placeNewPiece(2, 6, Teams.white, Pieces.pawn),
+            this.board.placeNewPiece(3, 6, Teams.white, Pieces.pawn),
+            this.board.placeNewPiece(4, 6, Teams.white, Pieces.pawn),
+            this.board.placeNewPiece(5, 6, Teams.white, Pieces.pawn),
+            this.board.placeNewPiece(6, 6, Teams.white, Pieces.pawn),
+            this.board.placeNewPiece(7, 6, Teams.white, Pieces.pawn)
         ];
     }
 
@@ -271,7 +285,7 @@ function Game()
                 var move = new Move();
                 move.moveNumber = 1;
                 move.team = this.dragPiece.team;
-                move.piece = this.dragPiece.pieceType.pieceLetter;
+                move.piece = Pieces.getLetter(this.dragPiece.pieceType);
                 move.from = new Point(this.dragStartSquare.x,
                                       this.dragStartSquare.y);
                 move.to = new Point(this.mouseBoardLocation.x,
@@ -283,7 +297,7 @@ function Game()
                     var capturedPiece = square.pickupPiece();
                     var opponentTeam = this.getPlayer(1 - this.dragPiece.team);
                     opponentTeam.piecesCaptured.push(capturedPiece);
-                    move.capturePiece = capturedPiece.pieceType.pieceLetter;
+                    move.capturePiece = Pieces.getLetter(capturedPiece.pieceType);
                 }
 
                 this.moveLog.addMove(move);
@@ -500,7 +514,7 @@ function Game()
         {
             // Draw the piece sprite.
             var piece = player.piecesCaptured[i];
-            var spr = piece.getSprite(player.team);
+            var spr = this.getPieceSprite(piece);
             if (spr != null && spr.image != null)
             {
 				this.context.drawImage(spr.image,
@@ -524,7 +538,7 @@ function Game()
 
     //-------------------------------------------------------------------------
     // Draw the board square at the given location.
-    this.drawBoardSquare = function (x, y, squareRect)
+    this.drawBoardSquare = function(x, y, squareRect)
     {
         var square = this.board.grid[x][y];
 		var piece = square.piece;
@@ -568,9 +582,17 @@ function Game()
     }
 
     //-------------------------------------------------------------------------
+    // Get the sprite for the given ChessPiece.
+    this.getPieceSprite = function(piece) {
+        if (piece.team == Teams.white)
+            return this.pieceSpritesWhite[piece.pieceType];
+        return this.pieceSpritesBlack[piece.pieceType];
+    }
+
+    //-------------------------------------------------------------------------
     // Draw a single chess piece at the given position.
     this.drawPiece = function(piece, x, y) {
-        var spr = piece.getSprite();
+        var spr = this.getPieceSprite(piece);
         if (spr != null && spr.image != null) {
 			this.context.drawImage(spr.image, spr.sourceX, spr.sourceY,
 				spr.sourceWidth, spr.sourceHeight, x, y,

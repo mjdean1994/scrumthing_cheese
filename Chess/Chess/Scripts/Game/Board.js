@@ -78,9 +78,9 @@ function ChessBoard()
     
     //-------------------------------------------------------------------------
     // Piece a new piece of the given type at the given location.
-    this.placeNewPiece = function (x, y, team, pieceType) 
+    this.placeNewPiece = function (x, y, team, piece) 
     {
-        var piece = new ChessPiece(pieceType, team, x, y);
+        var piece = new ChessPiece(piece, team, x, y);
         this.grid[x][y].piece = piece;
         return piece;
     }
@@ -89,6 +89,7 @@ function ChessBoard()
     // Piece a new piece of the given type at the given location.
     this.setupNewGame = function ()
     {
+
     }
 }
 
