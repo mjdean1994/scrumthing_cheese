@@ -193,7 +193,7 @@ function ChessPiece(pieceType, team, x, y) {
         var q2 = false;
         var q3 = false;
         var q4 = false;
-        for (var i = 1; i < 7; i++) {
+        for (var i = 1; i <= 7; i++) {
             if (!q1 && x + i < 8) {
                 if (board.getSquare(x + i, y) == null) { }
 
