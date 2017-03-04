@@ -15,6 +15,19 @@ function Move() {
     this.check        = false;
     this.checkmate    = false;
     this.castling     = false;
+
+
+    //-------------------------------------------------------------------------
+    // Get a description of what happings during this move.
+    this.getDescription = function() {
+        var description = "Moving " + Teams.getName(this.team) +
+            " " + Pieces.getName(this.piece) +
+            " from " + Notation.getLocationNotation(this.from) +
+            " to " + Notation.getLocationNotation(this.to);
+        if (this.capturePiece != Pieces.none)
+            description += ", capturing a " + Pieces.getName(this.capturePiece);
+        return description;
+    }
 }
 
 
@@ -28,19 +41,28 @@ function MoveLog()
 
     //-------------------------------------------------------------------------
     // Add a move to the log.
-    this.addMove = function (move) {
+    this.addMove = function(move) {
         this.moves.push(move);
-    }
+    };
 
+    //-------------------------------------------------------------------------
+    // Clear the log of all moves.
+    this.clear = function() {
+        this.moves = [];
+    };
     
 }
 
 
-// Convert a move log to a string, with move notations.
+//-----------------------------------------------------------------------------
+// Convert a move log to a string, with a list move notations, delimeted by
+// spaces. Example: Pc7c5 Nb8c6 Pf7f5 Ke8f7 Pb7b5 Pa7a5 Nc6d4
 MoveLog.prototype.toString = function () {
     var str = "";
     for (var i = 0; i < this.moves.length; i++) {
-        str += Notation.getMoveNotation(this.moves[i]) + " ";
+        if (i > 0)
+            str += " ";
+        str += Notation.getMoveNotation(this.moves[i]);
     }
     return str;
 }

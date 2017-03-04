@@ -35,6 +35,42 @@ function ChessStyle()
                                     
     this.turnTextFont                 = "24px Arial";
     this.turnTextColor                = "black";
+
+    // Load piece sprite sheet image.
+    var s = 60;
+	var image = new Image();
+	image.src = "ChessPieces.png";
+
+    // Create piece sprites.
+    this.pieceSpritesWhite = new Array(Pieces.count);
+    this.pieceSpritesWhite[Pieces.queen]  = new Sprite(image, 0 * s, 1 * s, s, s);
+    this.pieceSpritesWhite[Pieces.king]   = new Sprite(image, 1 * s, 1 * s, s, s);
+    this.pieceSpritesWhite[Pieces.rook]   = new Sprite(image, 2 * s, 1 * s, s, s);
+    this.pieceSpritesWhite[Pieces.knight] = new Sprite(image, 3 * s, 1 * s, s, s);
+    this.pieceSpritesWhite[Pieces.bishop] = new Sprite(image, 4 * s, 1 * s, s, s);
+    this.pieceSpritesWhite[Pieces.pawn]   = new Sprite(image, 5 * s, 1 * s, s, s);
+    this.pieceSpritesBlack = new Array(Pieces.count);
+    this.pieceSpritesBlack[Pieces.queen]  = new Sprite(image, 0 * s, 0 * s, s, s);
+    this.pieceSpritesBlack[Pieces.king]   = new Sprite(image, 1 * s, 0 * s, s, s);
+    this.pieceSpritesBlack[Pieces.rook]   = new Sprite(image, 2 * s, 0 * s, s, s);
+    this.pieceSpritesBlack[Pieces.knight] = new Sprite(image, 3 * s, 0 * s, s, s);
+    this.pieceSpritesBlack[Pieces.bishop] = new Sprite(image, 4 * s, 0 * s, s, s);
+    this.pieceSpritesBlack[Pieces.pawn]   = new Sprite(image, 5 * s, 0 * s, s, s);
+
+
+    //-------------------------------------------------------------------------
+    // Get the sprite for the given ChessPiece.
+    this.getPieceSprite = function(piece) {
+        return this.getPieceSpriteFromType(piece.team, piece.pieceType);
+    }
+
+    //-------------------------------------------------------------------------
+    // Get the sprite for a given team and piece type.
+    this.getPieceSpriteFromType = function(team, pieceType) {
+        if (team == Teams.white)
+            return this.pieceSpritesWhite[pieceType];
+        return this.pieceSpritesBlack[pieceType];
+    }
 }
 
 
@@ -56,6 +92,8 @@ function Game()
         this.moveLog = new MoveLog();
 
         this.style = new ChessStyle();
+        this.pieceSpritesWhite = [];
+        this.pieceSpritesBlack = [];
 
         this.squareSize = 64;
         this.boardPosX = 0;
@@ -64,8 +102,6 @@ function Game()
         this.dragPiece = null;
         this.dragStartSquare = null;
         
-        this.pieceSpritesWhite = [];
-        this.pieceSpritesBlack = [];
 
         this.players = [
             new Player(Teams.white, "Player White"),
@@ -74,7 +110,6 @@ function Game()
 
         this.board = new ChessBoard();
         
-        this.initializePieceTypes();
         this.initializeBoard();
 
         this.mousePosition = new Point(0, 0);
@@ -86,37 +121,12 @@ function Game()
     }
     
     //-------------------------------------------------------------------------
-    // Initialize the possible chess piece types.
-    this.initializePieceTypes = function ()
-    {
-        // Load piece sprite sheet image.
-        var s = 60;
-	    var image = new Image();
-	    image.src = "ChessPieces.png";
-
-        // Create piece sprites.
-        this.pieceSpritesWhite = new Array(Pieces.count);
-        this.pieceSpritesWhite[Pieces.queen]  = new Sprite(image, 0 * s, 1 * s, s, s);
-        this.pieceSpritesWhite[Pieces.king]   = new Sprite(image, 1 * s, 1 * s, s, s);
-        this.pieceSpritesWhite[Pieces.rook]   = new Sprite(image, 2 * s, 1 * s, s, s);
-        this.pieceSpritesWhite[Pieces.knight] = new Sprite(image, 3 * s, 1 * s, s, s);
-        this.pieceSpritesWhite[Pieces.bishop] = new Sprite(image, 4 * s, 1 * s, s, s);
-        this.pieceSpritesWhite[Pieces.pawn]   = new Sprite(image, 5 * s, 1 * s, s, s);
-        this.pieceSpritesBlack = new Array(Pieces.count);
-        this.pieceSpritesBlack[Pieces.queen]  = new Sprite(image, 0 * s, 0 * s, s, s);
-        this.pieceSpritesBlack[Pieces.king]   = new Sprite(image, 1 * s, 0 * s, s, s);
-        this.pieceSpritesBlack[Pieces.rook]   = new Sprite(image, 2 * s, 0 * s, s, s);
-        this.pieceSpritesBlack[Pieces.knight] = new Sprite(image, 3 * s, 0 * s, s, s);
-        this.pieceSpritesBlack[Pieces.bishop] = new Sprite(image, 4 * s, 0 * s, s, s);
-        this.pieceSpritesBlack[Pieces.pawn]   = new Sprite(image, 5 * s, 0 * s, s, s);
-    }
-    
-    //-------------------------------------------------------------------------
     // Setup the board with pieces laid out for a new game.
     this.initializeBoard = function ()
     {
-        //this.getPlayer(Teams.white).reset();
-        //this.getPlayer(Teams.black).reset();
+        this.board.clearBoard();
+        this.getPlayer(Teams.white).reset();
+        this.getPlayer(Teams.black).reset();
 
         // Place pieces onto the board for the black player.
         this.getPlayer(Teams.black).piecesInPlay =
@@ -162,43 +172,59 @@ function Game()
     }
 
     //-------------------------------------------------------------------------
+    // Reconstruct the board state given a string containing a list of moves.
     this.updateBoard = function(boardState)
     {
-        for (var i = 0; i < 64; i++) {
-            var x = i % 8;
-            var y = Math.floor(i / 8);
+        console.log("updateBoard: " + boardState);
 
-            var team;
-            if (boardState[i] == boardState[i].toUpperCase())
-            {
-                team = Teams.black;
-            }
-            else
-            {
-                team = Teams.white;
-            }
+        // Reset the board first.
+        this.initializeBoard();
 
-            if (boardState[i] == "P" || boardState[i] == "p") {
-                this.board.placeNewPiece(x, y, team, this.pawn)
-            }
-            else if (boardState[i] == "K" || boardState[i] == "k") {
-                this.board.placeNewPiece(x, y, team, this.king)
-            }
-            else if (boardState[i] == "Q" || boardState[i] == "q") {
-                this.board.placeNewPiece(x, y, team, this.queen)
-            }
-            else if (boardState[i] == "N" || boardState[i] == "n") {
-                this.board.placeNewPiece(x, y, team, this.knight)
-            }
-            else if (boardState[i] == "R" || boardState[i] == "r") {
-                this.board.placeNewPiece(x, y, team, this.rook)
-            }
-            else if (boardState[i] == "B" || boardState[i] == "b") {
-                this.board.placeNewPiece(x, y, team, this.bishop)
-            }
-            else {
-                this.board.getSquare(x,y).pickupPiece();
-            }
+        // Parse each move and apply it to the board.
+        var moveStrings = boardState.trim().split(" ");
+        this.moveLog.clear();
+        for (var i = 0; i < moveStrings.length; i++) {
+            var move = Notation.parseMove(moveStrings[i]);
+            this.moveLog.addMove(move);
+            this.applyMove(move);
+
+            // DEBUG: print the description for this move.
+            console.log(i + ". " + move.getDescription() + " (" + Notation.getMoveNotation(move) + ")");
+        }
+    }
+
+    //-------------------------------------------------------------------------
+    // Generate a board state string, composed of a list of move notations.
+    this.generateBoardState = function()
+    {
+        return this.moveLog.toString();
+    }
+    
+    //-------------------------------------------------------------------------
+    // Apply a move to the board, updating its state.
+    this.applyMove = function(move)
+    {
+        var fromSquare = this.board.getSquare(move.from.x, move.from.y);
+        var toSquare = this.board.getSquare(move.to.x, move.to.y);
+        var fromPiece = null;
+        var toPiece = null;
+        if (fromSquare != null)
+            fromPiece = fromSquare.piece;
+        if (toSquare != null)
+            toPiece = toSquare.piece;
+        
+        // TODO: pawn promotion, castling, check, checkmate
+        // *****
+
+        // Piece capture.
+        if (toPiece != null) {
+            toSquare.pickupPiece();
+            this.getPlayer(fromPiece.team).onCapturePiece(toPiece);
+        }
+        
+        // Piece movement.
+        if (fromPiece != null) {
+            toSquare.placePiece(fromSquare.pickupPiece());
         }
     }
 
@@ -226,7 +252,7 @@ function Game()
     // Get which team I am on.
     this.getOpponentTeam = function()
     {
-        return (1 - this.getMyTeam());
+        return Teams.getOpponent(this.getMyTeam());
     }
 
     // Get the board location after accouning for rotation. A player will
@@ -282,27 +308,24 @@ function Game()
             // Place the piece down.
             if (square != null && isValidMove)
             {
+                // Create a Move object for this move.
                 var move = new Move();
                 move.moveNumber = 1;
                 move.team = this.dragPiece.team;
-                move.piece = Pieces.getLetter(this.dragPiece.pieceType);
+                move.piece = this.dragPiece.pieceType;
                 move.from = new Point(this.dragStartSquare.x,
                                       this.dragStartSquare.y);
                 move.to = new Point(this.mouseBoardLocation.x,
                                     this.mouseBoardLocation.y);
 
-                // Check for capturing a piece piece.
+                // Check for capturing a piece.
                 if (square.hasPiece())
                 {
                     var capturedPiece = square.pickupPiece();
-                    var opponentTeam = this.getPlayer(1 - this.dragPiece.team);
-                    opponentTeam.piecesCaptured.push(capturedPiece);
-                    move.capturePiece = Pieces.getLetter(capturedPiece.pieceType);
+                    move.capturePiece = capturedPiece.pieceType;
                 }
 
                 this.moveLog.addMove(move);
-                console.log(this.moveLog.toString());
-
                 square.placePiece(this.dragPiece);
 
                 updateServerBoard(this.generateBoardState());
@@ -367,6 +390,8 @@ function Game()
         }
     }
 
+
+
     //-------------------------------------------------------------------------
     // Update the game for a single frame.
     this.update = function ()
@@ -382,6 +407,8 @@ function Game()
         this.boardPosX = Math.floor((this.canvas.width - boardWidth) / 2);
         this.boardPosY = Math.floor((this.canvas.height - boardHeight) / 2);
     }
+
+
 
     //-------------------------------------------------------------------------
     // Draw the game to the canvas.
@@ -510,11 +537,11 @@ function Game()
         var drawPos = new Point(
             this.style.capturePieceSpacing / 2,
             this.style.capturePieceSpacing / 2);
-        for (var i = 0; i < player.piecesCaptured.length; i++)
+        for (var i = 0; i < player.capturedPieceTypes.length; i++)
         {
             // Draw the piece sprite.
-            var piece = player.piecesCaptured[i];
-            var spr = this.getPieceSprite(piece);
+            var pieceType = player.capturedPieceTypes[i];
+            var spr = this.style.getPieceSpriteFromType(Teams.getOpponent(team), pieceType);
             if (spr != null && spr.image != null)
             {
 				this.context.drawImage(spr.image,
@@ -566,13 +593,13 @@ function Game()
         // Highlight valid move squares.
         if (isValidMove) {
             if (piece != null) {
-                this.fillRect(squareRect, "rgba(255, 0, 0, 0.5)"); // capture move
-                this.strokeRect(squareRect, "rgba(128, 0, 0, 1.0)");
+                this.fillRect(squareRect, this.style.squareCaptureMoveColor);
+                this.strokeRect(squareRect, this.style.squareCaptureMoveOutlineColor);
             }
             else
             {
-                this.fillRect(squareRect, "rgba(0, 255, 0, 0.5)");
-                this.strokeRect(squareRect, "rgba(0, 255, 0, 1.0)");
+                this.fillRect(squareRect, this.style.squareMoveColor);
+                this.strokeRect(squareRect, this.style.squareMoveOutlineColor);
             }
         }
 
@@ -582,17 +609,9 @@ function Game()
     }
 
     //-------------------------------------------------------------------------
-    // Get the sprite for the given ChessPiece.
-    this.getPieceSprite = function(piece) {
-        if (piece.team == Teams.white)
-            return this.pieceSpritesWhite[piece.pieceType];
-        return this.pieceSpritesBlack[piece.pieceType];
-    }
-
-    //-------------------------------------------------------------------------
     // Draw a single chess piece at the given position.
     this.drawPiece = function(piece, x, y) {
-        var spr = this.getPieceSprite(piece);
+        var spr = this.style.getPieceSprite(piece);
         if (spr != null && spr.image != null) {
 			this.context.drawImage(spr.image, spr.sourceX, spr.sourceY,
 				spr.sourceWidth, spr.sourceHeight, x, y,
@@ -601,91 +620,17 @@ function Game()
     }
     
     //-------------------------------------------------------------------------
+    // Draw an outlined rectangle.
     this.strokeRect = function(rect, color) {
 		this.context.strokeStyle = color;
         this.context.strokeRect(rect.x, rect.y, rect.width, rect.height);
     }
 
+    //-------------------------------------------------------------------------
+    // Draw an filled rectangle.
     this.fillRect = function(rect, color) {
 		this.context.fillStyle = color;
         this.context.fillRect(rect.x, rect.y, rect.width, rect.height);
     }
-
-    this.generateBoardState = function()
-    {
-        var boardState = "";
-
-        for (var i = 0; i < 8; i++) {
-            for (var j = 0; j < 8; j++) {
-                var square = game.board.getSquare(j, i);
-                var piece = square.piece;
-
-                if (!piece) {
-                    boardState += "0";
-                    continue;
-                }
-
-                var pieceName = piece.pieceType.name;
-                var pieceTeam = piece.team;
-
-                if (pieceName == "Pawn") {
-                    if (pieceTeam == 1) {
-                        boardState += "P";
-                    }
-                    else {
-                        boardState += "p";
-                    }
-                }
-
-                if (pieceName == "Knight") {
-                    if (pieceTeam == 1) {
-                        boardState += "N";
-                    }
-                    else {
-                        boardState += "n";
-                    }
-                }
-
-                if (pieceName == "Queen") {
-                    if (pieceTeam == 1) {
-                        boardState += "Q";
-                    }
-                    else {
-                        boardState += "q";
-                    }
-                }
-
-                if (pieceName == "King") {
-                    if (pieceTeam == 1) {
-                        boardState += "K";
-                    }
-                    else {
-                        boardState += "k";
-                    }
-                }
-
-                if (pieceName == "Bishop") {
-                    if (pieceTeam == 1) {
-                        boardState += "B";
-                    }
-                    else {
-                        boardState += "b";
-                    }
-                }
-
-                if (pieceName == "Rook") {
-                    if (pieceTeam == 1) {
-                        boardState += "R";
-                    }
-                    else {
-                        boardState += "r";
-                    }
-                }
-            }
-        }
-
-        return boardState;
-    }
-
 }
 

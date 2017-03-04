@@ -63,16 +63,16 @@ Notation.parseLocation = function(str) {
 Notation.getMoveNotation = function(move) {
     var result = "";
 
-    result += move.piece;
+    result += Pieces.getLetter(move.piece);
     result += Notation.getLocationNotation(move.from);
     result += Notation.getLocationNotation(move.to);
 
     if (move.castling)
         result += "O";
     if (move.promotePiece != Pieces.none)
-        result += "=" + move.promotePiece;
+        result += "=" + Pieces.getLetter(move.promotePiece);
     if (move.capturePiece != Pieces.none)
-        result += "x" + move.capturePiece;
+        result += "x" + Pieces.getLetter(move.capturePiece);
     if (move.checkmate)
         result += "#";
     else if (move.check)
@@ -104,14 +104,14 @@ Notation.parseMove = function(str) {
         else if (c == "K" || c == "Q" || c == "P" ||
             c == "R" || c == "N" || c == "B")
         {
-            move.piece = c;
+            move.piece = Pieces.fromLetter(c);
         }
         else if (c == "x" && i + 1 < str.length) {
-            move.capturePiece = str[i + 1];
+            move.capturePiece = Pieces.fromLetter(str[i + 1]);
             i++;
         }
         else if (c == "=" && i + 1 < str.length) {
-            move.promotePiece = str[i + 1];
+            move.promotePiece = Pieces.fromLetter(str[i + 1]);
             i++;
         }
         else if (charCode >= "a".charCodeAt(0) &&

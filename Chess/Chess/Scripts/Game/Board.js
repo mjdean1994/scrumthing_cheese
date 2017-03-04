@@ -86,10 +86,14 @@ function ChessBoard()
     }
 
     //-------------------------------------------------------------------------
-    // Piece a new piece of the given type at the given location.
-    this.setupNewGame = function ()
+    // Clear the board of all pieces.
+    this.clearBoard = function ()
     {
-
+        for (var x = 0; x < this.width; x += 1) {
+            for (var y = 0; y < this.height; y += 1) {
+			    this.grid[x][y].piece = null;
+            }
+        }
     }
 }
 

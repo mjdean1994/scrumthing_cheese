@@ -14,7 +14,7 @@ Pieces = {
     queen: 5,
     count: 6,
 
-    letters: ["P", "R", "K", "B", "K", "Q"],
+    letters: ["P", "R", "N", "B", "K", "Q"],
     names: ["Pawn", "Rook", "King", "Bishop", "King", "Queen"],
     
     //-----------------------------------------------------------------------
@@ -23,6 +23,16 @@ Pieces = {
         if (pieceIndex == Pieces.none)
             return "";
         return Pieces.letters[pieceIndex];
+    },
+
+    //-----------------------------------------------------------------------
+    // Get the piece index from the given piecce letter (ex: "P" --> Pieces.pawn)
+    fromLetter: function(pieceLetter) {
+        for (var i = 0; i < Pieces.count; i++) {
+            if (Pieces.letters[i] == pieceLetter)
+                return i;
+        }
+        return pieces.none;
     },
 
     //-----------------------------------------------------------------------
@@ -101,8 +111,8 @@ function ChessPiece(pieceType, team, x, y) {
     this.validMove = function (targetX, targetY) {
         var x = this.x;
         var y = this.y;
-        switch (this.pieceType.name) {
-            case "Pawn":
+        switch (this.pieceType) {
+            case Pieces.pawn:
                 if (this.team == Teams.black) {
                     if (y == 1) {
                         if (targetY - y <= 2 && targetY > y && targetX == x)
@@ -129,7 +139,7 @@ function ChessPiece(pieceType, team, x, y) {
                 }
                 return true;
                 break;
-            case "Knight":
+            case Pieces.knight:
                 if (Math.abs(targetX - x) == 2 && Math.abs(targetY - y) == 1)
                     return true;
                 else if (Math.abs(targetX - x) == 1 && Math.abs(targetY - y) == 2)
@@ -137,13 +147,13 @@ function ChessPiece(pieceType, team, x, y) {
                 else
                     return false;
                 break;
-            case "Bishop":
+            case Pieces.bishop:
                 if (Math.abs(targetX - x) == Math.abs(targetY - y) && targetX - x != 0)
                     return true;
                 else
                     return false;
                 break;
-            case "Rook":
+            case Pieces.rook:
                 if (targetX - x != 0 && targetY - y == 0)
                     return true;
                 else if (targetX - x == 0 && targetY - y != 0)
@@ -151,7 +161,7 @@ function ChessPiece(pieceType, team, x, y) {
                 else
                     return false;
                 break;
-            case "Queen":
+            case Pieces.queen:
                 if (Math.abs(targetX - x) == Math.abs(targetY - y) && targetX - x != 0)
                     return true;
                 else if (targetX - x != 0 && targetY - y == 0)
@@ -161,7 +171,7 @@ function ChessPiece(pieceType, team, x, y) {
                 else
                     return false;
                 break;
-            case "King":
+            case Pieces.king:
                 if (Math.abs(targetX - x) <= 1 && Math.abs(targetY - y) <= 1)
                     if (targetX - x != 0 || targetY - y != 0)
                         return true;
