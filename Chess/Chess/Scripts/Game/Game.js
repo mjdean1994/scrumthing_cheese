@@ -203,21 +203,29 @@ function Game()
         
         // Create the move object.
         var move = new Move();
-        move.moveNumber = 1;
-        move.team       = fromPiece.team;
-        move.piece      = fromPiece.pieceType;
-        move.from       = from;
-        move.to         = to;
+        move.moveNumber   = 1;
+        move.team         = fromPiece.team;
+        move.piece        = fromPiece.pieceType;
+        move.from         = from;
+        move.to           = to;
         move.capturePiece = (toPiece != null ? toPiece.pieceType : Pieces.none);
         move.promotePiece = Pieces.none;
         move.check        = false;
         move.checkmate    = false;
         move.castling     = false;
 
-        // TODO: Check for pawn promotion (if pawn reaches top row)
-        // For now, just automatically convert pawns to queens.
-        //if (move.piece == Pieces.pawn)
-            //move.promotePiece = Pieces.queen;
+        // Check for pawn promotion (if pawn reaches top row).
+        if (move.piece == Pieces.pawn) {
+            var promote = false;
+            if (move.team == Teams.white)
+                promote = (move.to.y == this.board.height - 1);
+            else if (move.team == Teams.black)
+                promote = (move.to.y == 0);
+            
+            // For now, just automatically convert pawns to queens.
+            if (promote)
+                move.promotePiece = Pieces.queen;
+        }
         
         // Temporarily update the board state to detect if this
         // move puts the opponent in check or checkmate.
