@@ -50,13 +50,27 @@ function MoveLog()
     this.clear = function() {
         this.moves = [];
     };
+
+    //-------------------------------------------------------------------------
+    // Check if a piece at the given board location has ever moved
+    // during the course of this game.
+    this.hasPieceEverMoved = function(pieceLocation) {
+        for (var i = this.moves.length - 1; i >= 0; i--) {
+            if (this.moves[i].to.x == pieceLocation.x &&
+                this.moves[i].to.y == pieceLocation.y)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
     
     //-------------------------------------------------------------------------
     // Get the last made move or null.
     this.getLastMove = function() {
         if (this.moves.length > 0)
             return this.moves[this.moves.length - 1];
-        return null
+        return null;
     }
 }
 
