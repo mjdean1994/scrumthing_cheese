@@ -9,7 +9,13 @@
 </div>
 
 <div class="row hidden" id="postTeam">
-    <div class="col-lg-8 col-lg-offset-1">
+    <div class="col-lg-2 col-lg-offset-1">
+        <h3>Proposed Moves:</h3>
+        <div class="list-group" id="voteList">
+            
+        </div>
+    </div>
+    <div class="col-lg-6">
         <canvas id="canvas" style="width:100%;height:600px;"></canvas>
     </div>
     <div class="col-lg-2">
@@ -72,6 +78,17 @@
                 $("#turn").val(turn);
             }
 
+            chat.client.updateVotes = function(keys, values) {
+                $.each(keys, function (index, value) {
+                    $("#voteList").html("");
+                    $("#voteList").append("<a class='list-group-item vote-list-item' name='" + value + "'>" + value + "<span class='badge'>" + values[index] + "</span></a>");
+
+                    $(".vote-list-item").click(function () {
+                        alert(this.name);
+                    });
+                })
+            }
+
             // Set initial focus to message input box.  
             $('#message').focus();
             // Start the connection.
@@ -92,6 +109,7 @@
 
                 updateServerBoard = function (boardState, Turn) {
                     $("#turn").val(Turn);
+                    $("#voteList").html("");
                     chat.server.updateBoard(boardState);
                 }
             });

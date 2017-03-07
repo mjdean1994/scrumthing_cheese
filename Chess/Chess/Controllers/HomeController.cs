@@ -37,5 +37,13 @@ namespace Chess.Controllers
         {
             return Json(ChatHub.Turn, JsonRequestBehavior.AllowGet);
         }
+
+        [HttpPost]
+        public JsonResult postSubmitVote(string vote)
+        {
+            ChatHub.ProposedMoves[vote] += 1;
+
+            return Json(true);
+        }
     }
 }
