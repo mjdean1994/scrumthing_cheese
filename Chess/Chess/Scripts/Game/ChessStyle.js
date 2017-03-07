@@ -33,8 +33,10 @@ function ChessStyle()
     this.teamNameFont                 = "16px Arial";
     this.teamNameColor                = "black";
                                     
-    this.turnTextFont                 = "24px Arial";
+    this.turnTextFont                 = "20px Arial";
     this.turnTextColor                = "black";
+    this.checkTextFont                = "24px Arial Black";
+    this.checkTextColor               = "black";
 
     // Load piece sprite sheet image.
     var s = 60;

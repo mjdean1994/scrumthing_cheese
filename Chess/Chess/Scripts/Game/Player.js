@@ -42,6 +42,9 @@ function Player(team, name)
     // List of piece types this player has captured.
     this.capturedPieceTypes = [];
 
+    // Is this player in check?
+    this.isInCheck = false;
+
     
     //-----------------------------------------------------------------------
     // Clear the piece lists for this player.

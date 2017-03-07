@@ -51,6 +51,13 @@ function MoveLog()
         this.moves = [];
     };
     
+    //-------------------------------------------------------------------------
+    // Get the last made move or null.
+    this.getLastMove = function() {
+        if (this.moves.length > 0)
+            return this.moves[this.moves.length - 1];
+        return null
+    }
 }
 
 

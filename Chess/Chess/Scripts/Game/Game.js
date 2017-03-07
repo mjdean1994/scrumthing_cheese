@@ -135,8 +135,9 @@ function Game()
         var toSquare      = this.board.getSquare(move.to.x, move.to.y);
         var movedPiece    = (fromSquare != null ? fromSquare.piece : null);
         var capturedPiece = (toSquare != null ? toSquare.piece : null);
+        var opponentTeam  = Teams.getOpponent(movedPiece.team);
         
-        // TODO: castling, check, checkmate
+        // TODO: castling, checkmate
 
         // Piece capture.
         if (capturedPiece != null) {
@@ -155,15 +156,20 @@ function Game()
         
         // Update move list.
         this.moveLog.moves.push(move);
+
+        // Update player in-check state.
+        this.getPlayer(opponentTeam).isInCheck = this.isChecking(movedPiece.team);
+        this.getPlayer(movedPiece.team).isInCheck = this.isChecking(opponentTeam);
     }
 
     //-------------------------------------------------------------------------
     // Locally revert/undo a move, updating this client's board and game state.
     this.revertMove = function(move)
     {
-        var fromSquare = this.board.getSquare(move.from.x, move.from.y);
-        var toSquare   = this.board.getSquare(move.to.x, move.to.y);
-        var movedPiece = (toSquare != null ? toSquare.piece : null);
+        var fromSquare   = this.board.getSquare(move.from.x, move.from.y);
+        var toSquare     = this.board.getSquare(move.to.x, move.to.y);
+        var movedPiece   = (toSquare != null ? toSquare.piece : null);
+        var opponentTeam = Teams.getOpponent(move.team);
         
         // TODO: un-castling.
         
@@ -177,7 +183,6 @@ function Game()
 
         // Piece un-capture.
         if (move.capturePiece != Pieces.none) {
-            var opponentTeam = Teams.getOpponent(move.team);
             var uncapturedPiece = toSquare.placeNewPiece(opponentTeam, move.capturePiece);
             this.getPlayer(move.team).removeCapturedPiece(move.capturePiece);
             this.getPlayer(opponentTeam).addPieceIntoPlay(uncapturedPiece);
@@ -185,6 +190,10 @@ function Game()
         
         // Update move list.
         this.moveLog.moves.pop();
+
+        // Update player in-check state.
+        this.getPlayer(opponentTeam).isInCheck = this.isChecking(movedPiece.team);
+        this.getPlayer(movedPiece.team).isInCheck = this.isChecking(opponentTeam);
     }
 
     //-------------------------------------------------------------------------
@@ -512,18 +521,30 @@ function Game()
 
         var turnTextPos = new Point(
             captureBox[0].x + (captureBox[0].width / 2),
+            //captureBox[0].x,
             boardRectBorder.y + (boardRectBorder.height / 2))
-        turnTextPos.y = captureBox[0].y + captureBox[0].height + 40;
+        turnTextPos.y = captureBox[0].y + captureBox[0].height + 30;
 
         var turnText = "Opponent's Turn";
-        if (this.getPlayerTurn() == this.getMyTeam())
-        {
+        if (this.getPlayerTurn() == this.getMyTeam()) {
             turnText = "Your Turn";
-            turnTextPos.y = captureBox[1].y - 40;
+            turnTextPos.y = captureBox[1].y - 30;
         }
 
         this.context.font = this.style.turnTextFont;
         this.context.fillStyle = this.style.turnTextColor;
+        this.context.textBaseline = "middle";
+        this.context.textAlign = "center";
+        this.context.fillText(turnText, turnTextPos.x, turnTextPos.y);
+        
+        turnText = "";
+        if (this.getPlayer(this.getMyTeam()).isInCheck ||
+            this.getPlayer(this.getOpponentTeam()).isInCheck)
+            turnText += "CHECK!";
+        turnTextPos.x = captureBox[0].x + (captureBox[0].width / 2);
+        turnTextPos.y = boardRect.y + (boardRect.height / 2);
+        this.context.font = this.style.checkTextFont;
+        this.context.fillStyle = this.style.checkTextColor;
         this.context.textBaseline = "middle";
         this.context.textAlign = "center";
         this.context.fillText(turnText, turnTextPos.x, turnTextPos.y);
