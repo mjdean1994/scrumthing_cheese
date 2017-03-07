@@ -431,13 +431,20 @@ function Game()
         this.canvas.width = this.canvas.clientWidth;
         this.canvas.height = this.canvas.clientHeight;
 
-        // Adjust board position and size based on canvas size.
-        // Board is made to be centered in the canvas.
-        this.squareSize = Math.floor((this.canvas.height / this.board.height) * 0.9);
-        var boardWidth = this.squareSize * this.board.width;
-        var boardHeight = this.squareSize * this.board.height;
-        this.boardPosX = Math.floor((this.canvas.width - boardWidth) / 2);
-        this.boardPosY = Math.floor((this.canvas.height - boardHeight) / 2);
+        // Adjust the board size to fit inside the canvas.
+        var boardSpaceWidth = this.canvas.width -
+            (this.style.captureBoxOffset + this.style.captureBoxSize.x);
+        var boardSpaceHeight = this.canvas.height;
+        var boardSize = Math.min(boardSpaceWidth, boardSpaceHeight) * 0.95;
+        this.squareSize = Math.floor(boardSize /
+            (this.board.width + (2 * this.style.boardBorderScale)));
+
+        // Align the board position to be centered in the canvas.
+        var boardBorder = this.squareSize * this.style.boardBorderScale;
+        var displayAreaWidth = boardSize + this.style.captureBoxOffset +
+            this.style.captureBoxSize.x
+        this.boardPosX = (this.canvas.width / 2) - (displayAreaWidth / 2) + boardBorder;
+        this.boardPosY = (this.canvas.height / 2) - (boardSize / 2) + boardBorder;
     }
 
 
