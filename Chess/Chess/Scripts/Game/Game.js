@@ -101,7 +101,7 @@ function Game()
     // Reconstruct the board state given a string containing a list of moves.
     this.updateBoard = function(boardState)
     {
-        console.log("updateBoard: " + boardState);
+        //console.log("updateBoard: " + boardState);
 
         // Reset the board first.
         this.initializeBoard();
@@ -113,7 +113,6 @@ function Game()
             if (moveStrings[i].length == 0)
                 continue;
             var move = Notation.parseMove(moveStrings[i]);
-            this.moveLog.addMove(move);
             this.applyMove(move);
 
             // DEBUG: print the description for this move.
@@ -129,7 +128,7 @@ function Game()
     }
     
     //-------------------------------------------------------------------------
-    // Apply a move, updating the board and game state.
+    // Locally apply a move, updating this client's board and game state.
     this.applyMove = function(move)
     {
         var fromSquare    = this.board.getSquare(move.from.x, move.from.y);
@@ -153,10 +152,13 @@ function Game()
         // Pawn promotion.
         if (move.promotePiece != Pieces.none)
             movedPiece.pieceType = move.promotePiece;
+        
+        // Update move list.
+        this.moveLog.moves.push(move);
     }
 
     //-------------------------------------------------------------------------
-    // Revert a move, updating the board and game state.
+    // Locally revert/undo a move, updating this client's board and game state.
     this.revertMove = function(move)
     {
         var fromSquare = this.board.getSquare(move.from.x, move.from.y);
@@ -180,6 +182,71 @@ function Game()
             this.getPlayer(move.team).removeCapturedPiece(move.capturePiece);
             this.getPlayer(opponentTeam).addPieceIntoPlay(uncapturedPiece);
         }
+        
+        // Update move list.
+        this.moveLog.moves.pop();
+    }
+
+    //-------------------------------------------------------------------------
+    // Create a Move object that moves a piece from one location to another.
+    this.createMove = function (from, to)
+    {
+        // Get the two squares involved.
+        var fromSquare = game.board.getSquare(from.x, from.y);
+        var toSquare = game.board.getSquare(to.x, to.y);
+        if (fromSquare == null || toSquare == null)
+            return;
+        var fromPiece = fromSquare.piece;
+        if (fromPiece == null)
+            return;
+        var toPiece = toSquare.piece;
+        
+        // Create the move object.
+        var move = new Move();
+        move.moveNumber = 1;
+        move.team       = fromPiece.team;
+        move.piece      = fromPiece.pieceType;
+        move.from       = from;
+        move.to         = to;
+        move.capturePiece = (toPiece != null ? toPiece.pieceType : Pieces.none);
+        move.promotePiece = Pieces.none;
+        move.check        = false;
+        move.checkmate    = false;
+        move.castling     = false;
+
+        // TODO: Check for pawn promotion (if pawn reaches top row)
+        // For now, just automatically convert pawns to queens.
+        //if (move.piece == Pieces.pawn)
+            //move.promotePiece = Pieces.queen;
+        
+        // Temporarily update the board state to detect if this
+        // move puts the opponent in check or checkmate.
+        this.applyMove(move);
+        {
+            // Check if this move puts the opponent in check.
+            if (this.isChecking(fromPiece.team))
+                move.check = true;
+        }
+        this.revertMove(move);
+
+        return move;
+    }
+
+    //-------------------------------------------------------------------------
+    // Send a move request to the server, moving a piece from one
+    // location to another. from and to are Points on the board.
+    this.sendMoveRequest = function (from, to)
+    {
+        // Create the move object and apply it to the local board state.
+        var move = this.createMove(from, to);
+        this.applyMove(move);
+
+        //console.log("Move: " + Notation.getMoveNotation(move));
+        //console.log("Sending request: " + this.generateBoardState());
+
+        // Send the updated board state to the server.
+        // TODO: this should be replaced with sending a vote for a single move.
+        updateServerBoard(this.generateBoardState());
     }
 
     //-------------------------------------------------------------------------
@@ -287,58 +354,6 @@ function Game()
                 this.validMoves = this.dragPiece.getValidMoves(this.board);
             }
         }
-    }
-
-    //-------------------------------------------------------------------------
-    // Send a move request to the server, moving a piece from one
-    // location to another. from and to are Points on the board.
-    this.sendMoveRequest = function (from, to)
-    {
-        // Get the two squares involved.
-        var fromSquare = game.board.getSquare(from.x, from.y);
-        var toSquare = game.board.getSquare(to.x, to.y);
-        if (fromSquare == null || toSquare == null)
-            return;
-        var fromPiece = fromSquare.piece;
-        if (fromPiece == null)
-            return;
-        var toPiece = toSquare.piece;
-        
-        // Create the move object.
-        var move = new Move();
-        move.moveNumber = 1;
-        move.team       = fromPiece.team;
-        move.piece      = fromPiece.pieceType;
-        move.from       = from;
-        move.to         = to;
-        move.capturePiece = (toPiece != null ? toPiece.pieceType : Pieces.none);
-        move.promotePiece = Pieces.none;
-        move.check        = false;
-        move.checkmate    = false;
-        move.castling     = false;
-
-        // TODO: Check for pawn promotion (if pawn reaches top row)
-        // For now, just automatically convert pawns to queens.
-        //if (move.piece == Pieces.pawn)
-            //move.promotePiece = Pieces.queen;
-        
-        // Update the board state with this move.
-        this.applyMove(move);
-
-        // Check if this move puts the opponent in check.
-        if (this.isChecking(fromPiece.team))
-            move.check = true;
-
-        // TODO: Check if this move puts the opponent in checkmate.
-
-        // Add the move the our move log.
-        this.moveLog.addMove(move);
-                
-        console.log("Move: " + Notation.getMoveNotation(move));
-
-        // Notify the server that a move was made.
-        // TODO: this should be replaced with sending a vote for the given move.
-        updateServerBoard(this.generateBoardState());
     }
 
     //-------------------------------------------------------------------------
