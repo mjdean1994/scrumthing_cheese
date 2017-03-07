@@ -361,16 +361,34 @@ function Game()
             this.dragStartSquare = null;
             this.validMoves = [];
         }
-        else if (square != null && square.hasPiece())
+        else if (square != null && square.hasPiece() &&
+                 this.CanMovePiece(square.piece))
         {
-            if (this.CanMovePiece(square.piece))
-            {
-                // Pickup and start dragging this piece.
-                this.dragging = true;
-                this.dragPiece = square.pickupPiece();
-                this.dragStartSquare = square;
-                this.validMoves = this.dragPiece.getValidMoves(this.board);
+            // Pickup and start dragging this piece.
+            this.dragging = true;
+            this.dragPiece = square.piece;
+            this.dragStartSquare = square;
+            this.validMoves = this.dragPiece.getValidMoves(this.board);
+
+            // For each valid move, check if it will put you
+            // in check. If it does, then discard that move.
+            for (var i = 0; i < this.validMoves.length; i++) {
+                var move = this.createMove(
+                    new Point(this.dragPiece.x, this.dragPiece.y),
+                    this.validMoves[i]);
+
+                // Temporarily adjust the board state to check for check.
+                this.applyMove(move);
+                {
+                    if (this.isChecking(Teams.getOpponent(move.team))) {
+                        this.validMoves.splice(i, 1);
+                        i--;
+                    }
+                }
+                this.revertMove(move);
             }
+
+            square.pickupPiece();
         }
     }
 
@@ -420,9 +438,9 @@ function Game()
         for (i = 0; i < moves.length; i++) {
             if (this.board.getSquare(moves[i].x, moves[i].y).piece != null) {
                 if (this.board.getSquare(moves[i].x, moves[i].y).piece.pieceType == Pieces.king) {
-                    console.log("CHECK");
-                    console.log(moves[i].x);
-                    console.log(moves[i].y);
+                    //console.log("CHECK");
+                    //console.log(moves[i].x);
+                    //console.log(moves[i].y);
                     return true;
                 }
             }
