@@ -253,7 +253,6 @@ function Game()
 
                 // TODO: Check for check, checkmate, pawn promotion
                 // *****
-
                 this.moveLog.addMove(move);
                 square.placePiece(this.dragPiece);
                 
@@ -318,6 +317,28 @@ function Game()
         {
             this.canvas.style.cursor = "default";
         }
+    }
+
+    //------------------------------------------------------------------------
+    //Called to check if the player for team "team" has put the other player in check
+    this.isChecking = function(team){
+        teamPieces = this.getPlayer(team).piecesInPlay;
+        moves = [];
+        for (i = 0; i < teamPieces.length; i++) {
+            moves = moves.concat(teamPieces[i].getValidMoves(this.board))
+        }
+        for (i = 0; i < moves.length; i++) {
+            if (this.board.getSquare(moves[i].x, moves[i].y).piece != null) {
+                if (this.board.getSquare(moves[i].x, moves[i].y).piece.pieceType == Pieces.king) {
+                    console.log("CHECK");
+                    console.log(moves[i].x);
+                    console.log(moves[i].y);
+                    return true;
+                }
+            }
+        }
+        return false;
+
     }
 
 
