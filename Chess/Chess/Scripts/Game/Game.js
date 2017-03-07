@@ -101,7 +101,7 @@ function Game()
     // Reconstruct the board state given a string containing a list of moves.
     this.updateBoard = function(boardState)
     {
-        //console.log("updateBoard: " + boardState);
+        console.log("updateBoard: " + boardState);
 
         // Reset the board first.
         this.initializeBoard();
@@ -110,6 +110,8 @@ function Game()
         var moveStrings = boardState.trim().split(" ");
         this.moveLog.clear();
         for (var i = 0; i < moveStrings.length; i++) {
+            if (moveStrings[i].length == 0)
+                continue;
             var move = Notation.parseMove(moveStrings[i]);
             this.moveLog.addMove(move);
             this.applyMove(move);
@@ -127,35 +129,57 @@ function Game()
     }
     
     //-------------------------------------------------------------------------
-    // Apply a move to the board, updating its state.
+    // Apply a move, updating the board and game state.
     this.applyMove = function(move)
     {
-        var fromSquare = this.board.getSquare(move.from.x, move.from.y);
-        var toSquare = this.board.getSquare(move.to.x, move.to.y);
-        var fromPiece = null;
-        var toPiece = null;
-        if (fromSquare != null)
-            fromPiece = fromSquare.piece;
-        if (toSquare != null)
-            toPiece = toSquare.piece;
+        var fromSquare    = this.board.getSquare(move.from.x, move.from.y);
+        var toSquare      = this.board.getSquare(move.to.x, move.to.y);
+        var movedPiece    = (fromSquare != null ? fromSquare.piece : null);
+        var capturedPiece = (toSquare != null ? toSquare.piece : null);
         
         // TODO: castling, check, checkmate
-        // *****
 
         // Piece capture.
-        if (toPiece != null) {
+        if (capturedPiece != null) {
             toSquare.pickupPiece();
-            this.getPlayer(fromPiece.team).onCapturePiece(toPiece);
-            this.getPlayer(toPiece.team).removePieceFromPlay(toPiece);
+            this.getPlayer(movedPiece.team).addCapturedPiece(capturedPiece.pieceType);
+            this.getPlayer(capturedPiece.team).removePieceFromPlay(capturedPiece);
         }
         
         // Piece movement.
-        if (fromPiece != null)
+        if (movedPiece != null)
             toSquare.placePiece(fromSquare.pickupPiece());
     
         // Pawn promotion.
         if (move.promotePiece != Pieces.none)
-            fromPiece.pieceType = move.promotePiece;
+            movedPiece.pieceType = move.promotePiece;
+    }
+
+    //-------------------------------------------------------------------------
+    // Revert a move, updating the board and game state.
+    this.revertMove = function(move)
+    {
+        var fromSquare = this.board.getSquare(move.from.x, move.from.y);
+        var toSquare   = this.board.getSquare(move.to.x, move.to.y);
+        var movedPiece = (toSquare != null ? toSquare.piece : null);
+        
+        // TODO: un-castling.
+        
+        // Piece un-movement.
+        if (movedPiece != null)
+            fromSquare.placePiece(toSquare.pickupPiece());
+    
+        // Pawn un-promotion.
+        if (move.promotePiece != Pieces.none)
+            movedPiece.pieceType = Pieces.pawn;
+
+        // Piece un-capture.
+        if (move.capturePiece != Pieces.none) {
+            var opponentTeam = Teams.getOpponent(move.team);
+            var uncapturedPiece = toSquare.placeNewPiece(opponentTeam, move.capturePiece);
+            this.getPlayer(move.team).removeCapturedPiece(move.capturePiece);
+            this.getPlayer(opponentTeam).addPieceIntoPlay(uncapturedPiece);
+        }
     }
 
     //-------------------------------------------------------------------------

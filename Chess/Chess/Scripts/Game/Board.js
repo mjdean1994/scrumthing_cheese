@@ -26,6 +26,14 @@ function BoardSquare(x, y)
         piece.x = this.x;
         piece.y = this.y;
     }
+    
+    //-------------------------------------------------------------------------
+    // Piece a new piece of the given type on this square.
+    this.placeNewPiece = function (team, piece) 
+    {
+        this.piece = new ChessPiece(piece, team, this.x, this.y);
+        return this.piece;
+    }
 
     //-------------------------------------------------------------------------
     // Pickup and return the chess piece on this square.
@@ -80,9 +88,7 @@ function ChessBoard()
     // Piece a new piece of the given type at the given location.
     this.placeNewPiece = function (x, y, team, piece) 
     {
-        var piece = new ChessPiece(piece, team, x, y);
-        this.grid[x][y].piece = piece;
-        return piece;
+        return this.grid[x][y].placeNewPiece(team, piece);
     }
 
     //-------------------------------------------------------------------------

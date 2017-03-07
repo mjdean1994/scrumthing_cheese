@@ -51,13 +51,31 @@ function Player(team, name)
     };
     
     //-----------------------------------------------------------------------
-    // Called when a piece is captured by this player.
-    this.onCapturePiece = function(piece) {
-        this.capturedPieceTypes.push(piece.pieceType);
+    // Add a piece type to the list of pieces captured by this player.
+    this.addCapturedPiece = function(pieceType) {
+        this.capturedPieceTypes.push(pieceType);
     }
 
     //-----------------------------------------------------------------------
-    // Remove a piece from the player's pieces in play array.
+    // Remove a single piece from the list of captured pieces.
+    this.removeCapturedPiece = function(pieceType) {
+        for (var i = 0; i < this.capturedPieceTypes.length; i++) {
+            if (this.capturedPieceTypes[i] == pieceType)
+            {
+                this.capturedPieceTypes.splice(i, 1);
+                return;
+            }
+        }
+    }
+
+    //-----------------------------------------------------------------------
+    // Add a piece into play for this player.
+    this.addPieceIntoPlay = function(piece) {
+        this.piecesInPlay.push(piece);
+    }
+
+    //-----------------------------------------------------------------------
+    // Remove a piece from the player's list of pieces in play.
     this.removePieceFromPlay = function(piece) {
         for (var i = 0; i < this.piecesInPlay.length; i++) {
             if (this.piecesInPlay[i] == piece)
