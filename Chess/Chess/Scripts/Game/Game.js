@@ -54,46 +54,46 @@ function Game()
         this.getPlayer(Teams.white).reset();
         this.getPlayer(Teams.black).reset();
 
-        // Place pieces onto the board for the black player.
-        this.getPlayer(Teams.black).piecesInPlay =
-        [
-            this.board.placeNewPiece(0, 0, Teams.black, Pieces.rook),
-            this.board.placeNewPiece(1, 0, Teams.black, Pieces.knight),
-            this.board.placeNewPiece(2, 0, Teams.black, Pieces.bishop),
-            this.board.placeNewPiece(3, 0, Teams.black, Pieces.queen),
-            this.board.placeNewPiece(4, 0, Teams.black, Pieces.king),
-            this.board.placeNewPiece(5, 0, Teams.black, Pieces.bishop),
-            this.board.placeNewPiece(6, 0, Teams.black, Pieces.knight),
-            this.board.placeNewPiece(7, 0, Teams.black, Pieces.rook),
-            this.board.placeNewPiece(0, 1, Teams.black, Pieces.pawn),
-            this.board.placeNewPiece(1, 1, Teams.black, Pieces.pawn),
-            this.board.placeNewPiece(2, 1, Teams.black, Pieces.pawn),
-            this.board.placeNewPiece(3, 1, Teams.black, Pieces.pawn),
-            this.board.placeNewPiece(4, 1, Teams.black, Pieces.pawn),
-            this.board.placeNewPiece(5, 1, Teams.black, Pieces.pawn),
-            this.board.placeNewPiece(6, 1, Teams.black, Pieces.pawn),
-            this.board.placeNewPiece(7, 1, Teams.black, Pieces.pawn)
-        ];
-
         // Place pieces onto the board for the white player.
         this.getPlayer(Teams.white).piecesInPlay =
         [
-            this.board.placeNewPiece(0, 7, Teams.white, Pieces.rook),
-            this.board.placeNewPiece(1, 7, Teams.white, Pieces.knight),
-            this.board.placeNewPiece(2, 7, Teams.white, Pieces.bishop),
-            this.board.placeNewPiece(3, 7, Teams.white, Pieces.queen),
-            this.board.placeNewPiece(4, 7, Teams.white, Pieces.king),
-            this.board.placeNewPiece(5, 7, Teams.white, Pieces.bishop),
-            this.board.placeNewPiece(6, 7, Teams.white, Pieces.knight),
-            this.board.placeNewPiece(7, 7, Teams.white, Pieces.rook),
-            this.board.placeNewPiece(0, 6, Teams.white, Pieces.pawn),
-            this.board.placeNewPiece(1, 6, Teams.white, Pieces.pawn),
-            this.board.placeNewPiece(2, 6, Teams.white, Pieces.pawn),
-            this.board.placeNewPiece(3, 6, Teams.white, Pieces.pawn),
-            this.board.placeNewPiece(4, 6, Teams.white, Pieces.pawn),
-            this.board.placeNewPiece(5, 6, Teams.white, Pieces.pawn),
-            this.board.placeNewPiece(6, 6, Teams.white, Pieces.pawn),
-            this.board.placeNewPiece(7, 6, Teams.white, Pieces.pawn)
+            this.board.placeNewPiece(0, 0, Teams.white, Pieces.rook),
+            this.board.placeNewPiece(1, 0, Teams.white, Pieces.knight),
+            this.board.placeNewPiece(2, 0, Teams.white, Pieces.bishop),
+            this.board.placeNewPiece(3, 0, Teams.white, Pieces.queen),
+            this.board.placeNewPiece(4, 0, Teams.white, Pieces.king),
+            this.board.placeNewPiece(5, 0, Teams.white, Pieces.bishop),
+            this.board.placeNewPiece(6, 0, Teams.white, Pieces.knight),
+            this.board.placeNewPiece(7, 0, Teams.white, Pieces.rook),
+            this.board.placeNewPiece(0, 1, Teams.white, Pieces.pawn),
+            this.board.placeNewPiece(1, 1, Teams.white, Pieces.pawn),
+            this.board.placeNewPiece(2, 1, Teams.white, Pieces.pawn),
+            this.board.placeNewPiece(3, 1, Teams.white, Pieces.pawn),
+            this.board.placeNewPiece(4, 1, Teams.white, Pieces.pawn),
+            this.board.placeNewPiece(5, 1, Teams.white, Pieces.pawn),
+            this.board.placeNewPiece(6, 1, Teams.white, Pieces.pawn),
+            this.board.placeNewPiece(7, 1, Teams.white, Pieces.pawn)
+        ];
+
+        // Place pieces onto the board for the black player.
+        this.getPlayer(Teams.black).piecesInPlay =
+        [
+            this.board.placeNewPiece(0, 7, Teams.black, Pieces.rook),
+            this.board.placeNewPiece(1, 7, Teams.black, Pieces.knight),
+            this.board.placeNewPiece(2, 7, Teams.black, Pieces.bishop),
+            this.board.placeNewPiece(3, 7, Teams.black, Pieces.queen),
+            this.board.placeNewPiece(4, 7, Teams.black, Pieces.king),
+            this.board.placeNewPiece(5, 7, Teams.black, Pieces.bishop),
+            this.board.placeNewPiece(6, 7, Teams.black, Pieces.knight),
+            this.board.placeNewPiece(7, 7, Teams.black, Pieces.rook),
+            this.board.placeNewPiece(0, 6, Teams.black, Pieces.pawn),
+            this.board.placeNewPiece(1, 6, Teams.black, Pieces.pawn),
+            this.board.placeNewPiece(2, 6, Teams.black, Pieces.pawn),
+            this.board.placeNewPiece(3, 6, Teams.black, Pieces.pawn),
+            this.board.placeNewPiece(4, 6, Teams.black, Pieces.pawn),
+            this.board.placeNewPiece(5, 6, Teams.black, Pieces.pawn),
+            this.board.placeNewPiece(6, 6, Teams.black, Pieces.pawn),
+            this.board.placeNewPiece(7, 6, Teams.black, Pieces.pawn)
         ];
     }
 
@@ -280,10 +280,11 @@ function Game()
     // always see their board rotated such that their side is at the bottom.
     this.getRotatedBoardLocation = function(location)
     {
-        if ($("#team").val() == "black")
-            return new Point(this.board.width - 1 - location.x, this.board.height - 1 - location.y);
+        if ($("#team").val() == "black") {
+            return new Point(this.board.width - 1 - location.x, location.y);
+        }
         else
-            return new Point(location.x, location.y);
+            return new Point(location.x, this.board.height - 1 - location.y);
     }
 
     this.IsTurnToMove = function()

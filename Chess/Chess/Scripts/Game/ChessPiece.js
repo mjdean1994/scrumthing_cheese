@@ -103,7 +103,7 @@ function ChessPiece(pieceType, team, x, y) {
         var y = this.y;
         switch (this.pieceType) {
             case Pieces.pawn:
-                if (this.team == Teams.black) {
+                if (this.team == Teams.white) {
                     if (y == 1) {
                         if (targetY - y <= 2 && targetY > y && targetX == x)
                             return true;
@@ -115,7 +115,7 @@ function ChessPiece(pieceType, team, x, y) {
                     else
                         return false;
                 }
-                else if (this.team == Teams.white) {
+                else if (this.team == Teams.black) {
                     if (y == 6) {
                         if (targetY - y >= -2 && targetY < y && targetX == x)
                             return true;
@@ -310,7 +310,7 @@ function ChessPiece(pieceType, team, x, y) {
         var x = this.x;
         var y = this.y;
         var moves = [];
-        if (this.team == Teams.black) {
+        if (this.team == Teams.white) {
 
             if (board.getSquare(x, y + 1) != null && !board.getSquare(x, y + 1).hasPiece()) {
                 moves.push(new Point(x, y + 1));
@@ -328,7 +328,7 @@ function ChessPiece(pieceType, team, x, y) {
                 moves.push(new Point(x + 1, y + 1));
             }
         }
-        else if (this.team == Teams.white) {
+        else if (this.team == Teams.black) {
             if (board.getSquare(x, y - 1) != null && !board.getSquare(x, y - 1).hasPiece()) {
                 moves.push(new Point(x, y - 1));
             }
