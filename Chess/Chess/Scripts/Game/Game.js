@@ -101,7 +101,7 @@ function Game()
     // Reconstruct the board state given a string containing a list of moves.
     this.updateBoard = function(boardState)
     {
-        console.log("updateBoard: " + boardState);
+        //console.log("updateBoard: " + boardState);
 
         // Reset the board first.
         this.initializeBoard();
@@ -115,7 +115,7 @@ function Game()
             this.applyMove(move);
 
             // DEBUG: print the description for this move.
-            console.log(i + ". " + move.getDescription() + " (" + Notation.getMoveNotation(move) + ")");
+            //console.log(i + ". " + move.getDescription() + " (" + Notation.getMoveNotation(move) + ")");
         }
     }
 
@@ -139,19 +139,23 @@ function Game()
         if (toSquare != null)
             toPiece = toSquare.piece;
         
-        // TODO: pawn promotion, castling, check, checkmate
+        // TODO: castling, check, checkmate
         // *****
 
         // Piece capture.
         if (toPiece != null) {
             toSquare.pickupPiece();
             this.getPlayer(fromPiece.team).onCapturePiece(toPiece);
+            this.getPlayer(toPiece.team).removePieceFromPlay(toPiece);
         }
         
         // Piece movement.
-        if (fromPiece != null) {
+        if (fromPiece != null)
             toSquare.placePiece(fromSquare.pickupPiece());
-        }
+    
+        // Pawn promotion.
+        if (move.promotePiece != Pieces.none)
+            fromPiece.pieceType = move.promotePiece;
     }
 
     //-------------------------------------------------------------------------
@@ -231,39 +235,16 @@ function Game()
                 }
             }
 
-            // Perform the move.
+            // Return the moved piece to its starting location.
+            this.dragStartSquare.placePiece(this.dragPiece);
+
+            // Perform the move if is valid.
             if (square != null && isValidMove)
             {
-                // Create a Move object for this move.
-                var move = new Move();
-                move.moveNumber = 1;
-                move.team = this.dragPiece.team;
-                move.piece = this.dragPiece.pieceType;
-                move.from = new Point(this.dragStartSquare.x,
-                                      this.dragStartSquare.y);
-                move.to = new Point(this.mouseBoardLocation.x,
-                                    this.mouseBoardLocation.y);
-
-                // Check for capturing a piece.
-                if (square.hasPiece())
-                {
-                    var capturedPiece = square.pickupPiece();
-                    move.capturePiece = capturedPiece.pieceType;
-                }
-
-                // TODO: Check for check, checkmate, pawn promotion
-                // *****
-                this.moveLog.addMove(move);
-                square.placePiece(this.dragPiece);
-                
-                // Notify the server that a move was made.
-                updateServerBoard(this.generateBoardState());
-
-            }
-            else
-            {
-                // Invalid placement! Return it to its original position.
-                this.dragStartSquare.placePiece(this.dragPiece);
+                // Create and send the move request to the server.
+                this.sendMoveRequest(
+                    new Point(this.dragPiece.x, this.dragPiece.y),
+                    this.mouseBoardLocation);
             }
 
             this.dragging = false;
@@ -275,13 +256,65 @@ function Game()
         {
             if (this.CanMovePiece(square.piece))
             {
-                // Start dragging this piece.
+                // Pickup and start dragging this piece.
                 this.dragging = true;
                 this.dragPiece = square.pickupPiece();
                 this.dragStartSquare = square;
                 this.validMoves = this.dragPiece.getValidMoves(this.board);
             }
         }
+    }
+
+    //-------------------------------------------------------------------------
+    // Send a move request to the server, moving a piece from one
+    // location to another. from and to are Points on the board.
+    this.sendMoveRequest = function (from, to)
+    {
+        // Get the two squares involved.
+        var fromSquare = game.board.getSquare(from.x, from.y);
+        var toSquare = game.board.getSquare(to.x, to.y);
+        if (fromSquare == null || toSquare == null)
+            return;
+        var fromPiece = fromSquare.piece;
+        if (fromPiece == null)
+            return;
+        var toPiece = toSquare.piece;
+        
+        // Create the move object.
+        var move = new Move();
+        move.moveNumber = 1;
+        move.team       = fromPiece.team;
+        move.piece      = fromPiece.pieceType;
+        move.from       = from;
+        move.to         = to;
+        move.capturePiece = (toPiece != null ? toPiece.pieceType : Pieces.none);
+        move.promotePiece = Pieces.none;
+        move.check        = false;
+        move.checkmate    = false;
+        move.castling     = false;
+
+        // TODO: Check for pawn promotion (if pawn reaches top row)
+        // For now, just automatically convert pawns to queens.
+        //if (move.piece == Pieces.pawn)
+            //move.promotePiece = Pieces.queen;
+        
+        // Update the board state with this move.
+        this.applyMove(move);
+
+        // Check if this move puts the opponent in check.
+        if (this.isChecking(fromPiece.team))
+            move.check = true;
+
+        // TODO: Check if this move puts the opponent in checkmate.
+
+        // Add the move the our move log.
+        this.moveLog.addMove(move);
+                
+        console.log("Move: " + Notation.getMoveNotation(move));
+
+        // Notify the server that a move was made.
+        // TODO: this should be replaced with sending a vote for the given move.
+        updateServerBoard(this.generateBoardState());
     }
 
     //-------------------------------------------------------------------------

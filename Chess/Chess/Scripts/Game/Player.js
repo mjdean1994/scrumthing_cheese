@@ -37,7 +37,7 @@ function Player(team, name)
     this.name = name;
 
     // List of ChessPiece objects which are currently in play for this player.
-    this.piecesInPlay = [];
+    this.piecesInPlay = []; // TODO: remove pieces from this list when captured!
 
     // List of piece types this player has captured.
     this.capturedPieceTypes = [];
@@ -54,5 +54,17 @@ function Player(team, name)
     // Called when a piece is captured by this player.
     this.onCapturePiece = function(piece) {
         this.capturedPieceTypes.push(piece.pieceType);
+    }
+
+    //-----------------------------------------------------------------------
+    // Remove a piece from the player's pieces in play array.
+    this.removePieceFromPlay = function(piece) {
+        for (var i = 0; i < this.piecesInPlay.length; i++) {
+            if (this.piecesInPlay[i] == piece)
+            {
+                this.piecesInPlay.splice(i, 1);
+                return;
+            }
+        }
     }
 }

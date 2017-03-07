@@ -233,6 +233,7 @@
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\Game\Board.js" />
     <Content Include="Scripts\Game\ChessPiece.js" />
+    <Content Include="Scripts\Game\ChessStyle.js" />
     <Content Include="Scripts\Game\Game.js" />
     <Content Include="Scripts\Game\Math.js" />
     <Content Include="Scripts\Game\Move.js" />

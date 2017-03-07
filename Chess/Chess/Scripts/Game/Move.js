@@ -5,16 +5,16 @@
 //-----------------------------------------------------------------------------
 function Move() {
 
-    this.moveNumber   = 1;
-    this.team         = Teams.white;
-    this.piece        = Pieces.none;
-    this.from         = new Point(0, 0);
-    this.to           = new Point(0, 0);
-    this.capturePiece = Pieces.none;
-    this.promotePiece = Pieces.none;
-    this.check        = false;
-    this.checkmate    = false;
-    this.castling     = false;
+    this.moveNumber   = 1;               // The squence number of this move.
+    this.team         = Teams.white;     // The team which the moved piece belongs to.
+    this.piece        = Pieces.none;     // The piece type that is moved.
+    this.from         = new Point(0, 0); // The location the piece moves from.
+    this.to           = new Point(0, 0); // The location the piece moves to.
+    this.capturePiece = Pieces.none;     // The type of the captured piece.
+    this.promotePiece = Pieces.none;     // The piece type that a pawn would get promoted to.
+    this.check        = false;           // Does this move put the opponent in check?
+    this.checkmate    = false;           // Does this move put the opponent in checkmate?
+    this.castling     = false;           // Is this a special castling move?
 
 
     //-------------------------------------------------------------------------

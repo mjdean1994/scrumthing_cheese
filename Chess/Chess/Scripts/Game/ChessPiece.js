@@ -69,16 +69,6 @@ function ChessPiece(pieceType, team, x, y) {
     this.captured = false;
 
     //---------------------------------------------------------------------
-    // Get the sprite for this chess piece.
-    /*this.getSprite = function () {
-        if (this.team == Teams.white)
-            return this.pieceType.spriteWhite;
-        else if (this.team == Teams.black)
-            return this.pieceType.spriteBlack;
-        return null;
-    }*/
-
-    //---------------------------------------------------------------------
     // Get a list of valid moves this piece can make given the board state.
     this.getValidMoves = function (board) {
         var moves = [];
